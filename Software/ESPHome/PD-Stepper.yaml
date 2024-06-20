@@ -1,0 +1,186 @@
+# PD Stepper ESPHome Config
+# https://github.com/joshr120/PD-Stepper
+
+# Todo:
+#  - add sensorless homing/serial comms to TMC2209
+#  - VBUS_SENSE adc read
+#  - Motor NTC read
+
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "u1qvnGLD6JjRQGNodaYXFFXSPxe7N+3wSKcwurJPhCM="
+
+ota:
+  password: "07b9f5a01b7f15d6523941ddf8f4b3fc"
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "PD-Stepper Fallback Hotspot"
+    password: "password"
+
+captive_portal:
+        
+          
+esphome:
+  name: stepper-motor
+  # Set microstepping and PD voltage pins on boot
+  on_boot:
+    priority: 600
+    then:
+      - output.turn_off:  #Microstep resolution configuration (internal pull-down resistors: MS2, MS1: 00: 1/8, 01: 1/32, 10: 1/64 11: 1/16
+          id: MS1_pin
+      - output.turn_off:
+          id: MS2_pin
+                          # 5V  9V  12V  15V  20V
+      - output.turn_off:  # 1   0    0    0    0
+          id: CFG1_pin
+      - output.turn_off:  # -   0    0    1    1
+          id: CFG2_pin
+      - output.turn_on:   # -   0    1    1    0
+          id: CFG3_pin
+  
+esp32:
+  board: esp32-s3-devkitc-1
+
+# Enable logging
+logger:
+
+# Define GPIO pins for microstepping & PD voltage configuration
+output:
+  - platform: gpio
+    pin: GPIO1
+    id: MS1_pin
+  - platform: gpio
+    pin: GPIO2
+    id: MS2_pin
+
+  - platform: gpio
+    pin: GPIO38
+    id: CFG1_pin
+  - platform: gpio
+    pin: GPIO48
+    id: CFG2_pin
+  - platform: gpio
+    pin: GPIO47
+    id: CFG3_pin
+        
+
+# Define binary input sensor for power_good and push button
+binary_sensor:
+  - platform: gpio
+    pin:
+      number: GPIO15  # PG Pin
+      mode: INPUT
+      inverted: true
+    name: "Power Good"
+    device_class: power
+    filters: #Debounce
+      - delayed_on: 10ms 
+
+  - platform: gpio
+    pin:
+      number: GPIO35  # Button 1 Pin
+      mode: INPUT
+    name: "Button 1"
+    filters: #Debounce
+      - delayed_on: 10ms
+      
+  - platform: gpio
+    pin:
+      number: GPIO36  # Button 2 Pin
+      mode: INPUT
+    name: "Button 2"
+    filters: #Debounce
+      - delayed_on: 10ms
+      
+  - platform: gpio
+    pin:
+      number: GPIO37  # Button 3 Pin
+      mode: INPUT
+    name: "Button 3"
+    filters: #Debounce
+      - delayed_on: 10ms
+
+# Example configuration entry
+stepper:
+  - platform: a4988 #using this for now as similar to TMC2209
+    id: my_stepper
+    step_pin: GPIO5
+    dir_pin: 
+      number: GPIO6
+      inverted: false #invert to change direction
+    max_speed: 16000 steps/s  #will depend on which microstep mode is set
+
+    sleep_pin: 
+      number: GPIO21
+      inverted: true #true for trinamic
+    acceleration: 600
+    deceleration: 800
+
+# Create cover (blinds) using stepper motor
+cover:
+  - platform: template
+    name: "Office Blinds"
+    id: office_blinds
+    device_class: blind
+    open_action:
+      - stepper.set_target:
+          id: my_stepper
+          target: 0
+      - sensor.template.publish:
+            id: position
+            state: !lambda return id(my_stepper).target_position;
+    close_action:
+      - stepper.set_target:
+          id: my_stepper
+          target: 77000   #how far it will travel
+      - sensor.template.publish:
+            id: position
+            state: !lambda return id(my_stepper).target_position;
+    stop_action:
+      - stepper.set_target:
+          id: my_stepper
+          target: !lambda return id(my_stepper).current_position;
+      - sensor.template.publish:
+          id: position
+          state: !lambda return id(my_stepper).current_position;
+    
+    optimistic: true
+    assumed_state: true
+          
+          
+#AS5600 rotary encoder
+i2c:
+  sda: GPIO8
+  scl: GPIO9
+  scan: true
+  id: bus_a
+
+as5600:
+  slow_filter: 16x #default 16x
+  
+          
+sensor:
+  # Blinds
+  - platform: template
+    name: "Blinds 1 Position"
+    id: position
+    
+  #AS5600 Rotary Encoder
+  - platform: as5600
+    name: Position
+    update_interval: 5s
+    raw_position:
+        name: Raw Position
+    gain:
+        name: Gain
+    magnitude:
+        name: Magnitude
+    status:
+        name: Status
