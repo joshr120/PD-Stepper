@@ -28,6 +28,11 @@ The original inspiration for this project was to make a compact USB PD powered s
 - Onboard 3.3V buck converter
 - Motor temperature measurment
 
+## Kits Available Soon Stay Tuned! ##
+<p align="center">
+  <img src="https://github.com/joshr120/PD-Stepper/assets/120012174/819eb4ef-f03f-44f5-8b74-9fb311b265e5" width="80%" />
+</p>
+
 ## Current use cases & examples in the works: ##
 - Home automation with ESPHome and home assistant
 - Take in standard Step and Direction inputs and incorperate in closed loop control
