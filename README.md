@@ -2,13 +2,13 @@
 PD Stepper is a USB PD Powered Nema 17 stepper driver using the Silent Trinamic Driver TMC2209 controlled with a ESP32-S3 for IoT and other applications.
 
 <p float="left">
-  <img src="https://github.com/joshr120/USB-PD-Stepper-Driver/assets/120012174/ba7bc5b1-e88a-49f0-8844-0d211900b3ac" width="48%" />
-  <img src="https://github.com/joshr120/USB-PD-Stepper-Driver/assets/120012174/39841e2b-00d1-4257-9e5e-37f5bc7c2a4f" width="48%" /> 
+  <img src="Software/img/PCB.png" width="48%" />
+  <img src="Software/img/Side.png" width="48%" /> 
 </p>
 
 <p float="left">
-  <img src="https://github.com/joshr120/USB-PD-Stepper-Driver/assets/120012174/d076abd4-243e-4dc6-b90f-01bfe40eda26" width="51%" />
-  <img src="https://github.com/joshr120/USB-PD-Stepper-Driver/assets/120012174/720177eb-e481-40ec-9c04-c6366b8985e7" width="37%" /> 
+  <img src="Software/img/upright.png" width="51%" />
+  <img src="Software/img/render.png" width="37%" /> 
 </p>
 
 
@@ -30,7 +30,7 @@ The original inspiration for this project was to make a compact USB PD powered s
 
 ## Kits Available Soon Stay Tuned! ##
 <p align="center">
-  <img src="https://github.com/joshr120/PD-Stepper/assets/120012174/5efd70d0-bc6b-4f1a-9826-3e60c423ccc5" width="80%" />
+  <img src="Software/img/kit.png" width="85%" />
 </p>
 
 ## Current use cases & examples in the works: ##
