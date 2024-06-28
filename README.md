@@ -2,13 +2,13 @@
 PD Stepper is a USB PD Powered Nema 17 stepper driver using the Silent Trinamic Driver TMC2209 controlled with a ESP32-S3 for IoT and other applications.
 
 <p float="left">
-  <img src="Software/img/PCB.png" width="48%" />
-  <img src="Software/img/Side.png" width="48%" /> 
+  <img src="https://github.com/joshr120/PD-Stepper/assets/120012174/70c9a55e-43c8-42c1-9540-dcf600ba0539" width="48%" />
+  <img src="https://github.com/joshr120/PD-Stepper/assets/120012174/e2fd122a-58a3-4d58-a0a7-cbbbc9104925" width="48%" /> 
 </p>
 
 <p float="left">
-  <img src="Software/img/upright.png" width="51%" />
-  <img src="Software/img/render.png" width="37%" /> 
+  <img src="https://github.com/joshr120/PD-Stepper/assets/120012174/65909313-01d8-4cda-bbda-bfbe47be087a" width="51%" />
+  <img src="https://github.com/joshr120/PD-Stepper/assets/120012174/ed572055-1679-4632-a867-deeb7a4562eb" width="37%" /> 
 </p>
 
 
@@ -30,8 +30,9 @@ The original inspiration for this project was to make a compact USB PD powered s
 
 ## Kits Available Soon Stay Tuned! ##
 <p align="center">
-  <img src="Software/img/kit.png" width="85%" />
+  <img src="https://github.com/joshr120/PD-Stepper/assets/120012174/21b7343f-a3d8-4c1d-8546-180d6f407111" width="85%" />
 </p>
+
 
 ## Current use cases & examples in the works: ##
 - Home automation with ESPHome and home assistant
@@ -44,7 +45,7 @@ PCB is a 4 layer 1.6mm custom PCB, this is what allows it to have its comapact f
 
 ## Housing: ##
 The top cover can be 3D printed however this may not handle well if the motor & controller get warm under high load. A cover machined from polycarbonite or acrylic is a much better option (and looks awesome). An aluminium housing gives a sleek industrial look as well as acting as a heatsink, however this should not be used if you are using WiFi on the ESP32-S3 as it may block the antenna and reduce the WiFi signal.
-![Screenshot 2024-05-23 213000](https://github.com/joshr120/USB-PD-Stepper-Driver/assets/120012174/0c35d216-5a75-4f9d-85c3-fbf170c61fe6)
+![Screenshot 2024-05-23 213000](https://github.com/joshr120/PD-Stepper/assets/120012174/c674265c-5ef8-4af8-b98e-f7b009177ec6)
 
 ## Cooling: ##
 Stepper motor drivers can get warm under full load. The IC is cooled from the rear through a machined aluminium heatspreader which also acts as a spacer between the PCB and the motor. Two sizes of adhesive heatsinks can also stick to the top side with the larger one protruding through the housing and the smaller one siting just below the surface allowing the stepper to sit flat.
