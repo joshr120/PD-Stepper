@@ -7,7 +7,9 @@ The Board type should be set as "ESP32S3 Dev Module"
 
 USB CDC on Boot should be set to "Enabled"
 
-![image](https://github.com/joshr120/USB-PD-Stepper-Driver/assets/120012174/e59f0777-ea70-48a8-9ecd-7ac681c9cb8d)
+![upload settings](https://github.com/joshr120/PD-Stepper/assets/120012174/f002548a-ec56-4bae-93c7-10ec5e83b6d1)
+
+
 
 ## Arduino Serial Bug: ##
 There is currently a software bug being worked on which does not allow serial communication over USB to work at the same time as programming. A program may fail to upload if Serial.begin() has previously been called. 
