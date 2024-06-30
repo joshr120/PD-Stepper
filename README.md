@@ -29,9 +29,8 @@ The original inspiration for this project was to make a compact USB PD powered s
 - Motor temperature measurment
 
 <p align="center">
-  <img src="https://github.com/joshr120/PD-Stepper/assets/120012174/a41c6bb3-abe4-41c6-b43e-824363fd6f9a" width="80%" />
+  <img src="https://github.com/joshr120/PD-Stepper/assets/120012174/06d7e566-fc5c-4fe1-b435-bdd9c66b06c8" width="85%" />
 </p>
-
 
 ## Kits Available Soon Stay Tuned! ##
 <p align="center">
