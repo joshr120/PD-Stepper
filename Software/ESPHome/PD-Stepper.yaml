@@ -10,10 +10,10 @@
 # Enable Home Assistant API
 api:
   encryption:
-    key: "u1qvnGLD6JjRQGNodaYXFFXSPxe7N+3wSKcwurJPhCM="
+    key: "c1uNv/dyYPAkygiSdfpmM2UlQzi1B9xElFm3sKEeEFc="  #EXAMPLE KEY GENERATE YOUR OWN
 
 ota:
-  password: "07b9f5a01b7f15d6523941ddf8f4b3fc"
+  password: "PASSWORD"
 
 wifi:
   ssid: !secret wifi_ssid
@@ -69,6 +69,13 @@ output:
   - platform: gpio
     pin: GPIO47
     id: CFG3_pin
+    
+  - platform: ledc
+    pin: GPIO10
+    id: LED1_PIN
+  - platform: ledc
+    pin: GPIO12
+    id: LED2_PIN
         
 
 # Define binary input sensor for power_good and push button
@@ -184,3 +191,23 @@ sensor:
         name: Magnitude
     status:
         name: Status
+        
+  #Read VBUS voltage (could be used to debug PD voltage etc)
+  - platform: adc
+    pin: GPIO4
+    name: "VBUS Voltage"
+    update_interval: 10s
+    attenuation: 11dB
+    filters:
+      - multiply: 8.47742
+      
+light:
+  - platform: monochromatic
+    output: LED1_PIN
+    id: LED1
+    name: "LED 1"
+  - platform: monochromatic
+    output: LED2_PIN
+    id: LED2
+    name: "LED 2"
+        
