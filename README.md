@@ -33,6 +33,7 @@ The original inspiration for this project was to make a compact USB PD powered s
 </p>
 
 ## Kits Available Soon Stay Tuned! ##
+   ### Subscribe on [YouTube](https://www.youtube.com/@ThingsbyJosh-bg9cv ) for updates. ###
 <p align="center">
   <img src="https://github.com/joshr120/PD-Stepper/assets/120012174/21b7343f-a3d8-4c1d-8546-180d6f407111" width="85%" />
 </p>
