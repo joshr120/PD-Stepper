@@ -45,7 +45,9 @@ The original inspiration for this project was to make a compact USB PD powered s
 - Camera slider with web interface for control and sensorlesshoming (sensorlesshoming example coming soon)
 
 ## PCB: ##
-PCB is a 4 layer 1.6mm custom PCB, this is what allows it to have its comapact form factor. The bare prototype boards were kindly provided by [PCBWay](https://pcbway.com/g/heg1oh). Schematic and GERBERs can be found in the PCB folder.
+PCB is a 4 layer 1.6mm custom PCB, this is what allows it to have its comapact form factor. The bare prototype boards were kindly provided by [PCBWay](https://pcbway.com/g/heg1oh). The PCB's are using PCBWay's black soldermask with a gold ENIG surface finish, which turned out great and look amazing.
+
+Schematic and GERBERs can be found in the PCB folder.
 
 ## Housing: ##
 The top cover can be 3D printed however this may not handle well if the motor & controller get warm under high load. A cover machined from polycarbonite or acrylic is a much better option (and looks awesome). An aluminium housing gives a sleek industrial look as well as acting as a heatsink, however this should not be used if you are using WiFi on the ESP32-S3 as it may block the antenna and reduce the WiFi signal.
