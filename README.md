@@ -30,15 +30,17 @@ Full Video and build guide here: https://youtu.be/qECEGUZE04s?si=eJ1GiZOdusYehDC
 - Motor temperature measurment
 
 <p align="center">
-  <img src="https://github.com/joshr120/PD-Stepper/assets/120012174/06d7e566-fc5c-4fe1-b435-bdd9c66b06c8" width="85%" />
+  <img src="https://github.com/user-attachments/assets/3b868411-6f42-4f43-bae5-cc7c13b03733" width="85%" />
 </p>
+
 
 ## Kits Available For [Pre-Order](https://thingsbyjosh.com/products/pd-stepper-pre-order) Now ##
    ### Subscribe on [YouTube](https://www.youtube.com/@ThingsbyJosh-bg9cv) for further updates. ###
 
 <p align="center">
-  <img src="https://github.com/joshr120/PD-Stepper/assets/120012174/21b7343f-a3d8-4c1d-8546-180d6f407111" width="85%" />
+  <img src="https://github.com/user-attachments/assets/afe1a7e6-6428-43a0-ad6f-892179ca4088" width="85%" />
 </p>
+
 
 
 ## Current use cases & examples in the works: ##
