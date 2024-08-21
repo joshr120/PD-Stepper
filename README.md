@@ -16,6 +16,8 @@ PD Stepper is a USB PD Powered Nema 17 stepper driver using the Silent Trinamic 
 
 Stepper motors are fantastic for projects, but assembling the necessary components—like a microcontroller, stepper driver, power supplies for both motor and microcontroller, and optionally an encoder can lead to bulkiness, high costs, complexity, and challenges in integrating them into compact or space-constrained designs. This project addresses these issues by consolidating everything onto a single board, eliminating the drawbacks with little to no compromises.
 
+Full Video and build guide here: https://youtu.be/qECEGUZE04s?si=eJ1GiZOdusYehDCc
+
 ## Main Features: ##
 - **TMC2209 Stepper Motor Driver:** Incorporates the TMC2209 stepper motor driver, renowned for its silent operation, high precision, and advanced features such as stealthChop™, spreadCycle™ and sensorless homing, ensuring smooth, silent and efficient motor control.
 - **USB PD Power:** Utilizes the USB PD standard for power delivery, giving high power, a USB-C connector and no bulky 12 and 24V power bricks needed. It ensures compatibility with a variety of power sources and enabling seamless integration into existing setups. USB PD along with the TMC2209 can drive a stepper motor with upto ~50W of power.
