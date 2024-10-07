@@ -1,6 +1,7 @@
 
 /*  Code to test the basic functionality of the USB PD Stepper Driver and Controller
  * 
+ * Note this only uses the step and fir pins to interface with the TMC2209. See other examples for more advanced serial commms
  * by Things by Josh 2024
  */
 
@@ -88,7 +89,6 @@ void setup() {
   digitalWrite(MS1, LOW); //Microstep resolution configuration (internal pull-down resistors: MS2, MS1: 00: 1/8, 01: 1/32, 10: 1/64 11: 1/16
   digitalWrite(MS2, LOW);
   digitalWrite(DIR, motorDir); //set direction at start
-//  Serial1.begin(115200, SERIAL_8N1, TMC_RX, TMC_TX); //will probably use a library in the future instead
 
   
   //PD Trigger Setup
@@ -217,7 +217,7 @@ void readEncoder(){
   // Update the previous raw counts
   prev_raw_counts = raw_counts;
 
-  total_encoder_counts = raw_counts + (raw_counts * revolutions);
+  total_encoder_counts = raw_counts + (4096 * revolutions);
 
 
   Serial.println("");
