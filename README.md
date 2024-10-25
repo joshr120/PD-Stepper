@@ -38,31 +38,32 @@ Full Video and build guide here: https://youtu.be/qECEGUZE04s?si=eJ1GiZOdusYehDC
    ### Subscribe on [YouTube](https://www.youtube.com/@ThingsbyJosh-bg9cv) for further updates. ###
 
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/afe1a7e6-6428-43a0-ad6f-892179ca4088" width="85%" />
+  <img src="https://github.com/user-attachments/assets/56066584-a997-46ac-9af4-3fe24f0ac039" width="85%" />
 </p>
 
 
-
-## Current use cases & examples in the works: ##
+## Current Examples: ##
+- Webserver allowing configuration, velocity and position control. (Comes pre-loaded on all kits, see getting started for how to use it.)
 - Home automation with ESPHome and home assistant
-- Take in standard Step and Direction inputs and incorperate in closed loop control
 - Wireless position copying from one encoder to another motor
-- Camera slider with web interface for control and sensorlesshoming (sensorlesshoming example coming soon)
 
 ## PCB: ##
-PCB is a 4 layer 1.6mm custom PCB, this is what allows it to have its comapact form factor. The bare prototype boards were kindly provided by [PCBWay](https://pcbway.com/g/heg1oh). The PCB's are using PCBWay's black soldermask with a gold ENIG surface finish, which turned out great and look amazing.
-
-Schematic and GERBERs can be found in the PCB folder.
+PCB is a 4 layer 1.6mm custom PCB, this is what allows it to have its comapact form factor.
+The Schematic, GERBERs and source files can be found in the PCB folder.
 
 ## Housing: ##
-The top cover can be 3D printed however this may not handle well if the motor & controller get warm under high load. A cover machined from polycarbonite or acrylic is a much better option (and looks awesome). An aluminium housing gives a sleek industrial look as well as acting as a heatsink, however this should not be used if you are using WiFi on the ESP32-S3 as it may block the antenna and reduce the WiFi signal.
-![Screenshot 2024-05-23 213000](https://github.com/joshr120/PD-Stepper/assets/120012174/c674265c-5ef8-4af8-b98e-f7b009177ec6)
+The Full Kits comes with an injection molded polycarbonate cover. This can also be 3D printed however PLA may not be suitable as the driver can get warm.
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/9c12dd6e-50da-40aa-a390-ea1c486dddc5" width="85%" />
+</p>
+
 
 ## Cooling: ##
 Stepper motor drivers can get warm under full load. The IC is cooled from the rear through a machined aluminium heatspreader which also acts as a spacer between the PCB and the motor. Two sizes of adhesive heatsinks can also stick to the top side with the larger one protruding through the housing and the smaller one siting just below the surface allowing the stepper to sit flat.
 
 ## Software: ##
-The software is currently still improving but current sample code should be more than enough to get you started
+The software is currently still evolving but current sample code should be more than enough to get you started
 
 ### ESPHome ###
 The provided .yaml file allows you to control the motor through ESPHOME (setup as blinds in this example). It allows you to use the buttons as inputs and set the USB PD voltage. It also outputs the AS5600 encoder reading to be used within ESPHome. The USB PD voltage and stepper microsteps can be set at startup.
