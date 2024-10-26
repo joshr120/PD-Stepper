@@ -244,19 +244,9 @@ void setup() {
 
   configureSettings(); //use saved settings
 
-  ///////////////////////////////////////
-  // Currently Can't auto enter bootloader if
-  // serial.begin has been called,
-  // so hold down SW2 on boot to enable serial 
-  // if you need to read outputs but not program (Reset or power cycle to program)
-  ///////////////////////////////////////
-  //(Can also manually enter bootloader mode by holding BOOT, press RST, release BOOT)
-
-  if (digitalRead(SW2) == LOW){  //push = LOW
-    Serial.begin(115200);
-    Serial.println("Code Starting");
-  }
-  ////////////////////////////////////////////
+  delay(200); //delay needed before "Serial.begin" to ensure bootloader mode entered correctly. Otherwise bootloader mode may need to be manually entered by holding BOOT, press RST, release BOOT
+  Serial.begin(115200);
+  Serial.println("Code Starting");
   
   // Set up ESP32 as an Access Point
   WiFi.softAP(ssid, password);

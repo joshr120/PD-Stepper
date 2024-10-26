@@ -1,7 +1,7 @@
 
 /*  Code to test the basic functionality of the USB PD Stepper Driver and Controller
  * 
- * Note this only uses the step and fir pins to interface with the TMC2209. See other examples for more advanced serial commms
+ * Note this only uses the step and dir pins to interface with the TMC2209. See other examples for more advanced serial commms
  * by Things by Josh 2024
  */
 
@@ -21,7 +21,7 @@
 #define SPREAD  7
 #define TMC_TX  17
 #define TMC_RX  18
-#define DIAG    20
+#define DIAG    16
 #define INDEX   11
 
 //PD Trigger (CH224K)
@@ -81,9 +81,9 @@ void setup() {
   pinMode(DIR, OUTPUT);
   pinMode(MS1, OUTPUT);
   pinMode(MS1, OUTPUT);
-//  pinMode(SPREAD, OUTPUT);
-//  pinMode(INDEX, INPUT);
-//  pinMode(DIAG, INPUT);  //will need to be attached to interrupt for sensorless homing
+  pinMode(SPREAD, OUTPUT);
+  pinMode(INDEX, INPUT);
+  pinMode(DIAG, INPUT); 
 
   digitalWrite(TMC_EN, HIGH); //High to disable on startup
   digitalWrite(MS1, LOW); //Microstep resolution configuration (internal pull-down resistors: MS2, MS1: 00: 1/8, 01: 1/32, 10: 1/64 11: 1/16
@@ -116,19 +116,9 @@ void setup() {
   digitalWrite(LED1, LOW);
   digitalWrite(LED2, LOW);
 
-
-  ///////////////////////////////////////
-  // Can't auto enter bootloader mode if
-  // serial.begin has been called
-  // so hold down SW2 on boot to enable serial 
-  // if you need to read outputs but not program
-  ///////////////////////////////////////
-  //(Can also manually enter bootloader mode by holding BOOT, press RST, release BOOT)
-
-  if (digitalRead(SW2) == LOW){  //push = LOW
-    Serial.begin(115200);
-    Serial.println("Code Starting");
-  }
+  delay(500); //delay needed before "Serial.begin" to ensure bootloader mode entered correctly. Otherwise bootloader mode may need to be manually entered by holding BOOT, press RST, release BOOT
+  Serial.begin(115200);
+  Serial.println("Code Starting");
 
     //AS5600 Hall Encoder Setup
   Wire.begin(SDA, SCL);  //start wire with earlier defined pins
@@ -150,7 +140,8 @@ void loop() {
       flashState = 0;
     }
   }
-  
+
+  delay(100);
   
 }
 
@@ -217,10 +208,8 @@ void readEncoder(){
   // Update the previous raw counts
   prev_raw_counts = raw_counts;
 
-  total_encoder_counts = raw_counts + (4096 * revolutions);
+  total_encoder_counts = raw_counts + (4096 * revolutions);\
 
-
-  Serial.println("");
   Serial.print("Encoder Counts: ");
   Serial.println(total_encoder_counts);
   Serial.println("");  

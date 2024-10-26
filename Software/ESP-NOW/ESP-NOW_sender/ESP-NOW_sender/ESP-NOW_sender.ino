@@ -34,7 +34,7 @@ esp_now_peer_info_t peerInfo;
 #define SPREAD  7
 #define TMC_TX  17
 #define TMC_RX  18
-#define DIAG    20
+#define DIAG    16
 #define INDEX   11
 
 //PD Trigger (CH224K)
@@ -98,18 +98,9 @@ void setup() {
   digitalWrite(LED2, LOW);
 
 
-   ///////////////////////////////////////
-  // Can't auto enter bootloader if
-  // serial.begin has been called
-  // so hold down SW2 on boot to enable serial 
-  // (wont auto enter bootloader mode)
-  ///////////////////////////////////////
-  //(Can also manually enter bootloader mode by holding BOOT, press RST, release BOOT)
-
-  if (digitalRead(SW2) == LOW){  //push = LOW
-    Serial.begin(115200);
-  }
-  
+  delay(500); //delay needed before "Serial.begin" to ensure bootloader mode entered correctly. Otherwise bootloader mode may need to be manually entered by holding BOOT, press RST, release BOOT
+  Serial.begin(115200);
+  Serial.println("Code Starting");
  
   // Set device as a Wi-Fi Station
   WiFi.mode(WIFI_STA);
