@@ -24,5 +24,5 @@ There was a software bug which did not allow serial communication over USB to wo
 
 There are a couple of work arounds for this;
 - You can manaully enter bootloader mode by holding the BOOT button, pressing and releasing the RST button and then releasing the BOOT button.
-- Alternatively software can be set up such Serial.begin() is only called on startup if a button is held at boot. This will allow USB serial commication on this power cycle but not programming (This is done in all example sketches). Could also be implemented the opposite way if you plan on using serial comms more often than uploading.
+- Alternatively software can be set up such Serial.begin() is only called on startup if a button is held at boot. This will allow USB serial commication on this power cycle but not programming (This was done in all example sketches previously). Could also be implemented the opposite way if you plan on using serial comms more often than uploading.
 - This bug is not present when using ESPHome.
