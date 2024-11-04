@@ -14,7 +14,7 @@ NOTE: Do not disconnect/connect the motor while the board is powered.
 
 **3.** Open a browser and type in the IP Address **192.168.4.1**
 
-<img src="https://github.com/user-attachments/assets/1005cf06-ae04-48b1-bd71-008bdf97db94" width="40%" />
+<img src="https://github.com/user-attachments/assets/c4efd506-1c79-46b7-9adb-9545b20af1c9" width="40%" />
    
 **5.** From here you can use velocity/postion control and play around with different settings.
 
