@@ -5,7 +5,9 @@ If you just received your PD Stepper this will show you how to spin a motor and 
 
 Timestamp 1:50 of [this video](https://youtu.be/qECEGUZE04s?t=110) shows how to setup a Nema 17 with your kit. There are 2 looms provided in the kit for different motors, try one and if at the next step your motor stutters/doesnt spin, power off the board and try the other one. 
 
-NOTE: Do not disconnect/connect the motor while the board is powered.
+NOTES: 
+1. Do not disconnect/connect the motor while the board is powered.
+2. If you are not using the heatspreader/spacer (partial kit) ensure the board is not resting directly on the motor as this could short out the traces on the underside of the PCB. Use washers or an insualting layer.
 
 ## Running the Webserver ##
 **1.** Connect the PD Stepper to your PD power supply.
