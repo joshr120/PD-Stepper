@@ -1,0 +1,263 @@
+external_components:
+  - source: github://slimcdk/esphome-custom-components
+    components: [tmc2209, stepper]
+
+substitutions:
+  encoder_closed_pos: "80000" # full blinds length
+  stepper_encoder_ratio: "0.195" # ratio between stepper microstepping (4) and encoder. 4 x 200 / 4096 = 0.195
+
+globals:
+  - id: encoder_tracking_
+    type: int32_t[2]
+    restore_value: no
+
+  - id: encoder_offset_
+    type: int32_t
+    restore_value: no
+
+  - id: sensored_home_pos
+    type: int32_t
+    restore_value: no
+    initial_value: "0"
+
+wifi:
+  ssid: REPLACEME
+  password: REPLACEME
+
+api:
+
+ota:
+  - platform: esphome
+  
+logger:
+
+esp32:
+  board: esp32-s3-devkitc-1
+  framework:
+    type: esp-idf
+
+esphome:
+  name: office-blinds
+  platformio_options:
+    board_build.flash_mode: dio
+    upload_speed: 921600
+  on_boot:
+    - tmc2209.configure:
+        microsteps: 4
+        interpolation: true
+        tcool_threshold: 400
+    - tmc2209.stallguard:
+        threshold: 70
+    - tmc2209.currents:
+        irun: 4
+        ihold: 0
+        tpowerdown: 0
+        iholddelay: 0
+        standstill_mode: freewheeling
+    - button.press: home
+
+
+web_server:
+  include_internal: true
+  ota: false
+  version: 3
+  log: false
+
+
+i2c:
+  sda: 8
+  scl: 9
+  scan: true
+
+uart:
+  tx_pin: 17
+  rx_pin: 18
+  baud_rate: 712000
+
+output:
+  - platform: ledc
+    pin: 10
+    id: led1_output
+
+  - platform: ledc
+    pin: 12
+    id: led2_output
+
+light:
+  - platform: monochromatic
+    output: led1_output
+    id: led1
+    name: LED 1
+  - platform: status_led
+    output: led2_output
+    id: led2
+    name: Status LED
+
+stepper:
+  - platform: tmc2209
+    id: motor
+    max_speed: 800 steps/s
+    acceleration: 1500 steps/s^2
+    deceleration: 1500 steps/s^2
+    rsense: 100 mOhm
+    vsense: False
+    enn_pin: 21
+    diag_pin: 16
+    index_pin: 11
+    # step_pin: 5
+    # dir_pin: 6
+    on_stall:
+      - logger.log: "Motor stalled!"
+      - stepper.stop: motor
+      - lambda: id(sensored_home_pos) = id(encoder)->get_state();
+      - cover.template.publish:
+          id: blinds
+          state: OPEN
+      - light.turn_on:
+          id: led1
+          transition_length: 0s
+      - delay: 250ms
+      - light.turn_off:
+          id: led1
+          transition_length: 1s
+
+button:
+  - platform: restart
+    name: Restart
+
+  - platform: template
+    name: Home
+    id: home
+    on_press:
+      - stepper.set_target:
+          id: motor
+          target: -${encoder_closed_pos}
+
+  - platform: template
+    name: Stop
+    on_press:
+      - stepper.stop: motor
+
+binary_sensor:
+ - platform: gpio
+   name: Power Good
+   pin:
+     number: 15
+     mode: INPUT
+     inverted: true
+   device_class: power
+   filters:
+     - delayed_on: 10ms
+
+ - platform: gpio
+   name: Button 1
+   pin:
+     number: 35
+     mode: INPUT
+     inverted: true
+   id: btn1
+   filters:
+     - delayed_on: 10ms
+   on_press:
+     - cover.open: blinds
+
+ - platform: gpio
+   name: Button 2
+   id: btn2
+   pin:
+     number: 36
+     mode: INPUT
+     inverted: true
+   filters:
+     - delayed_on: 10ms
+   on_press:
+     - tmc2209.disable: motor
+
+ - platform: gpio
+   name: Button 3
+   id: btn3
+   pin:
+     number: 37
+     mode: INPUT
+     inverted: true
+   filters:
+     - delayed_on: 10ms
+   on_press:
+     - cover.close: blinds
+
+as5600:
+  slow_filter: 16x
+
+sensor:
+  - platform: as5600
+    id: encoder_status
+    update_interval: 60s
+    status:
+      name: Encoder status
+    
+  - platform: as5600
+    name: Encoder
+    id: encoder
+    update_interval: 0s # beware of the polling rate
+    filters:
+      - delta: 1 # throttle the high polling rate to only act on value changes
+      # compute absolute position from angle value
+      - lambda: |
+          const uint8_t curr_trirant = clamp<float>(floor(x / 1365.0), 0, 2);
+          const uint8_t prev_trirant = clamp<float>(floor(id(encoder_tracking_)[0] / 1365.0), 0, 2);
+          const int16_t encoder_diff = (4095 - x + id(encoder_tracking_)[0]);
+
+          if ((curr_trirant == 2 && prev_trirant == 0)) {
+            id(encoder_tracking_)[1] -= encoder_diff; // crossed zero clockwise
+          } else if ((curr_trirant == 0 && prev_trirant == 2)) {
+            id(encoder_tracking_)[1] += encoder_diff; // crossed zero counterclockwise
+          } else {
+            id(encoder_tracking_)[1] -= (id(encoder_tracking_)[0] - x);
+          }
+          id(encoder_tracking_)[0] = x;
+          return id(encoder_tracking_)[1];
+      - multiply: -1.0
+    accuracy_decimals: 0
+    state_class: measurement
+
+  - platform: adc
+    pin: 4
+    name: VBUS Voltage
+    update_interval: 10s
+    attenuation: 12dB
+    filters:
+      - multiply: 8.47742
+
+
+
+cover:
+  - platform: template
+    id: blinds
+    name: Blinds
+    has_position: true
+    assumed_state: false
+    internal: true
+    lambda: "return 1.0 - ((id(encoder)->get_state()-id(sensored_home_pos)) / ${encoder_closed_pos});"
+    stop_action:
+      - tmc2209.disable: motor
+    open_action:
+      - stepper.report_position:
+          id: motor
+          position: !lambda return (1.0-id(blinds)->position) * ${encoder_closed_pos} * ${stepper_encoder_ratio};
+      - stepper.set_target:
+          id: motor
+          target: 0
+    close_action:
+      - stepper.report_position:
+          id: motor
+          position: !lambda return (1.0-id(blinds)->position) * ${encoder_closed_pos} * ${stepper_encoder_ratio};
+      - stepper.set_target:
+          id: motor
+          target: !lambda return ${encoder_closed_pos} * ${stepper_encoder_ratio} * 1.01;
+    position_action:
+      - stepper.report_position:
+          id: motor
+          position: !lambda return (1.0-id(blinds)->position) * ${encoder_closed_pos} * ${stepper_encoder_ratio};
+      - stepper.set_target:
+          id: motor
+          target: !lambda return (1.0-pos) * ${encoder_closed_pos} * ${stepper_encoder_ratio};
