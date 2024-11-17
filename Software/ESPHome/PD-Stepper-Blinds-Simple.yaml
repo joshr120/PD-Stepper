@@ -1,34 +1,17 @@
 # PD Stepper ESPHome Config
-# https://github.com/joshr120/PD-Stepper
-
-# Todo:
-#  - add sensorless homing/serial comms to TMC2209
-#  - VBUS_SENSE adc read
-#  - Motor NTC read
-
-
-# Enable Home Assistant API
-api:
-  encryption:
-    key: "c1uNv/dyYPAkygiSdfpmM2UlQzi1B9xElFm3sKEeEFc="  #EXAMPLE KEY GENERATE YOUR OWN
-
-ota:
-  password: "PASSWORD"
+# Simple example using step/dir control with the A4988 Component
 
 wifi:
   ssid: !secret wifi_ssid
   password: !secret wifi_password
 
-  # Enable fallback hotspot (captive portal) in case wifi connection fails
-  ap:
-    ssid: "PD-Stepper Fallback Hotspot"
-    password: "password"
+api:
 
-captive_portal:
-        
+ota:
+  - platform: esphome
           
 esphome:
-  name: stepper-motor
+  name: pd-stepper-blinds
   # Set microstepping and PD voltage pins on boot
   on_boot:
     priority: 600
@@ -69,13 +52,6 @@ output:
   - platform: gpio
     pin: GPIO47
     id: CFG3_pin
-    
-  - platform: ledc
-    pin: GPIO10
-    id: LED1_PIN
-  - platform: ledc
-    pin: GPIO12
-    id: LED2_PIN
         
 
 # Define binary input sensor for power_good and push button
@@ -121,8 +97,8 @@ stepper:
     step_pin: GPIO5
     dir_pin: 
       number: GPIO6
-      inverted: false #invert to change direction
-    max_speed: 16000 steps/s  #will depend on which microstep mode is set
+      inverted: false #to change direction (depending on what side blind is on?)
+    max_speed: 16000 steps/s  #depends on microstep set
 
     sleep_pin: 
       number: GPIO21
@@ -191,23 +167,12 @@ sensor:
         name: Magnitude
     status:
         name: Status
-        
-  #Read VBUS voltage (could be used to debug PD voltage etc)
+  
+  #Read VBUS voltage
   - platform: adc
-    pin: GPIO4
-    name: "VBUS Voltage"
+    pin: 4
+    name: VBUS Voltage
     update_interval: 10s
-    attenuation: 11dB
+    attenuation: 12dB
     filters:
       - multiply: 8.47742
-      
-light:
-  - platform: monochromatic
-    output: LED1_PIN
-    id: LED1
-    name: "LED 1"
-  - platform: monochromatic
-    output: LED2_PIN
-    id: LED2
-    name: "LED 2"
-        

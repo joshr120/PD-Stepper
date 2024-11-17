@@ -1,0 +1,218 @@
+# This example uses a custom TMC2209 component to control the PD Stepper
+# Motor can be moved using a slider within ESPHome
+
+external_components:
+  - source: github://slimcdk/esphome-custom-components
+    components: [tmc2209, stepper]
+
+globals:
+  - id: encoder_tracking_
+    type: int32_t[2]
+    restore_value: no
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+api:
+
+ota:
+  - platform: esphome
+
+logger:
+
+esp32:
+  board: esp32-s3-devkitc-1
+  framework:
+    type: esp-idf
+
+esphome:
+  name: pd-stepper
+  platformio_options:
+    board_build.flash_mode: dio
+    upload_speed: 921600
+  on_boot:
+    - tmc2209.configure:
+        microsteps: 4
+        direction: clockwise
+        interpolation: true
+        tcool_threshold: 400
+    - tmc2209.stallguard:
+        threshold: 60
+    - tmc2209.currents:
+        irun: 16
+        ihold: 0
+        tpowerdown: 0
+        iholddelay: 0
+        standstill_mode: freewheeling
+    
+     #set PD voltage    # 5V  9V  12V  15V  20V
+    - output.turn_off:  # 1   0    0    0    0
+        id: CFG1_pin
+    - output.turn_on:   # -   0    0    1    1
+        id: CFG2_pin
+    - output.turn_off:  # -   0    1    1    0
+        id: CFG3_pin
+
+i2c:
+  sda: 8
+  scl: 9
+  scan: true
+
+uart:
+  tx_pin: 17
+  rx_pin: 18
+  baud_rate: 712000
+
+output:
+  - platform: ledc
+    pin: 10
+    id: led1_output
+
+  - platform: ledc
+    pin: 12
+    id: led2_output
+
+  - platform: gpio
+    pin: GPIO38
+    id: CFG1_pin
+  - platform: gpio
+    pin: GPIO48
+    id: CFG2_pin
+  - platform: gpio
+    pin: GPIO47
+    id: CFG3_pin
+
+
+light:
+  - platform: monochromatic
+    output: led1_output
+    id: led1
+    name: LED 1
+  - platform: status_led
+    output: led2_output
+    id: led2
+    name: Status LED
+
+stepper:
+  - platform: tmc2209
+    id: driver
+    max_speed: 800 steps/s
+    acceleration: 1500 steps/s^2
+    deceleration: 1500 steps/s^2
+    rsense: 100 mOhm
+    vsense: False
+    enn_pin: 21
+    diag_pin: 16
+    index_pin: 11
+    on_status:
+      - logger.log:
+          format: "Driver is reporting an update! (code %d)"
+          args: ["code"]
+    on_stall:
+      - logger.log: "Motor stalled!"
+      - stepper.stop: driver
+      - light.turn_on:
+          id: led1
+          transition_length: 0s
+      - delay: 250ms
+      - light.turn_off:
+          id: led1
+          transition_length: 1s
+
+button:
+  - platform: restart
+    name: Restart
+
+  - platform: template
+    name: Stop
+    on_press:
+      - stepper.stop: driver
+
+binary_sensor:
+  - platform: gpio
+    name: Power Good
+    pin:
+      number: 15
+      mode: INPUT
+      inverted: true
+    device_class: power
+    filters:
+      - delayed_on: 10ms
+
+  - platform: gpio
+    name: Button 1
+    pin:
+      number: 35
+      mode: INPUT
+      inverted: true
+    id: btn1
+    filters:
+      - delayed_on: 10ms
+
+  - platform: gpio
+    name: Button 2
+    id: btn2
+    pin:
+      number: 36
+      mode: INPUT
+      inverted: true
+    filters:
+      - delayed_on: 10ms
+
+  - platform: gpio
+    name: Button 3
+    id: btn3
+    pin:
+      number: 37
+      mode: INPUT
+      inverted: true
+    filters:
+      - delayed_on: 10ms
+
+as5600:
+  slow_filter: 16x
+
+sensor:
+  - platform: as5600
+    name: Encoder
+    id: encoder
+    update_interval: 0s # beware of the polling rate
+    filters:
+      - delta: 2
+      # filter which computes absolute position from angle value
+      - lambda: |
+          const uint16_t curr = x; //current encoder value 0-4095
+          const uint16_t prev = id(encoder_tracking_)[0]; //previous encoder value 0-4095
+          if (curr > 3000 && prev < 1000) {
+            id(encoder_tracking_)[1] -= (4095 - curr + prev); // crossed zero clockwise (went under 0)
+          } else if (curr < 1000 && prev > 3000) {
+            id(encoder_tracking_)[1] += (4095 - prev + curr); // crossed zero counterclockwise (went over 4095)
+          } else {
+            id(encoder_tracking_)[1] += (curr - prev);
+          }
+          id(encoder_tracking_)[0] = curr;
+          return id(encoder_tracking_)[1];
+    accuracy_decimals: 0
+    state_class: measurement
+
+  - platform: adc
+    pin: 4
+    name: VBUS Voltage
+    update_interval: 10s
+    attenuation: 12dB
+    filters:
+      - multiply: 8.47742
+
+number:
+  - platform: template
+    name: Target position
+    min_value: -10000
+    max_value: 10000
+    step: 100
+    lambda: return id(driver)->current_position;
+    update_interval: 1s
+    set_action:
+      - stepper.set_target:
+          id: driver
+          target: !lambda "return x;"
