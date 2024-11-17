@@ -11,7 +11,11 @@ USB CDC on Boot should be set to "Enabled"
 
 
 ## ESPHome: ##
-The current ESPHome .yaml config file treats the TMC2209 as a a4988 driver as there is no TMC2209 intergration yet. The microsteps and PD voltage are set at startup by GPIO pins and the motor is driven via the STEP and DIR pins. A future intergration could allow for advanced TMC2209 features such as sensorless homing (Could also manually talk to the TMC2209 with the [UART Bus component](https://esphome.io/components/uart.html))
+The **PD-Stepper-Blinds-Advanced.yaml** config file uses the [custom TMC2209](https://github.com/slimcdk/esphome-custom-components/tree/master/esphome/components/tmc2209) component by [slimcdk](https://github.com/slimcdk). It also uses the AS5600 encoder so that if the blinds are manually moved it will not lose its end positions. Thanks to the custom componenet the example can also be modified to use stall gaurd for sensorless homing. PD voltage can be configured and it set an startup.
 
-Other interfaces exposed to ESPHOME include the POWER GOOD signal, this is a signal indicating the PD Stepper is getting the requested voltage from the USB power supply. The 3 buttons on the side are also set up is binary sensors and the encoder position is read using the [AS5600 component](https://esphome.io/components/sensor/as5600.html).
+The **PD-Stepper-Blinds-Simple.yaml** config file simply treats the TMC2209 as a a4988 driver. The microsteps and PD voltage are set at startup by GPIO pins and the motor is driven via the STEP and DIR pins.
+
+The **PD-Stepper-Position-Control.yaml** config also uses the [custom TMC2209](https://github.com/slimcdk/esphome-custom-components/tree/master/esphome/components/tmc2209) component by [slimcdk](https://github.com/slimcdk). It is a more stripped down version of PD-Stepper-Blinds-Advanced.yaml allowing you to set the position of the motor using a simple slider. A good base for use cases other than blinds.
+
+These examples also present the buttons, LEDs, power good and bus voltages to the ESPHome interface so you can do what you like with them.
 
