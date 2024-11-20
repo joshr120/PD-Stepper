@@ -5,7 +5,7 @@
  * 
  *    How to Use:
  * 1. Connect to created WiFi Network named "PD Stepper"
- * 2. On a browser visit 192.168.1.1
+ * 2. On a browser visit 192.168.4.1
  * 
  *  For more info and to purchase PD Stepper kits visit:
  *  https://thingsbyjosh.com
