@@ -1,7 +1,9 @@
 # **PD Stepper** - More Software Info
 
+#### If you just received your PD Stepper see the [Setup Instructions](https://github.com/joshr120/PD-Stepper/tree/main/Getting%20Started) for how to get started
+
 ## Arduino Upload settings: ##
-When uplooading software with the Arduino IDE ensure you have firtst installed the ESP32 Add-on in Arduino IDE there are [many tutorials](https://randomnerdtutorials.com/installing-esp32-arduino-ide-2-0/) on how to do this.
+When uploading software with the Arduino IDE ensure you have firtst installed the ESP32 Add-on in Arduino IDE there are [many tutorials](https://randomnerdtutorials.com/installing-esp32-arduino-ide-2-0/) on how to do this.
 
 The Board type should be set as "ESP32S3 Dev Module"
 
