@@ -1,7 +1,7 @@
 # **PD Stepper** - USB PD Closed Loop Stepper Driver & Controller
 PD Stepper is a USB PD Powered Nema 17 stepper driver using the Silent Trinamic Driver TMC2209 controlled with a ESP32-S3 for IoT and other applications.
 
-### Kits Available For Pre-Order Now: [ThingsbyJosh.com](https://thingsbyjosh.com/products/pd-stepper-pre-order) ###
+### Kits Available Now: [ThingsbyJosh.com](https://thingsbyjosh.com/products/pd-stepper) ###
 
 <p float="left">
   <img src="https://github.com/joshr120/PD-Stepper/assets/120012174/70c9a55e-43c8-42c1-9540-dcf600ba0539" width="48%" />
@@ -34,8 +34,8 @@ Full Video and build guide here: https://youtu.be/qECEGUZE04s?si=eJ1GiZOdusYehDC
 </p>
 
 
-## Kits Available For [Pre-Order](https://thingsbyjosh.com/products/pd-stepper-pre-order) Now ##
-   ### Subscribe on [YouTube](https://www.youtube.com/@ThingsbyJosh-bg9cv) for further updates. ###
+## Kits Available For [Order](https://thingsbyjosh.com/products/pd-stepper) Now ##
+   ### Subscribe on [YouTube](https://www.youtube.com/@ThingsbyJosh) for further updates. ###
 
 <p align="center">
   <img src="https://github.com/user-attachments/assets/56066584-a997-46ac-9af4-3fe24f0ac039" width="85%" />
@@ -43,7 +43,7 @@ Full Video and build guide here: https://youtu.be/qECEGUZE04s?si=eJ1GiZOdusYehDC
 
 
 ## Current Examples: ##
-- Webserver allowing configuration, velocity and position control. (Comes pre-loaded on all kits, see getting started for how to use it.)
+- Webserver allowing configuration, velocity and position control. (Comes pre-loaded on all kits, see [getting started](https://github.com/joshr120/PD-Stepper/tree/main/Getting%20Started) for how to use it.)
 - Home automation with ESPHome and home assistant
 - Wireless position copying from one encoder to another motor
 
