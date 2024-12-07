@@ -87,15 +87,17 @@ A few arduino examples are provided in this repo:
 ## Control ##
 The primary way to control the PD Stepper is over WiFi (e.g ESPHome, ESP NOW or through a webserver) however there are many other ways you can control it
 
-- Thanks to the pin mux on the ESP32-S3 the AUX connector can be used to send/receive commands over many different protocols. For example: Serial UART, I2C and standard STEP & DIR signals.
+- Thanks to the pin mux on the ESP32-S3 the AUX connector (3 pin JST SH) can be used to send/receive commands over many different protocols. For example: Serial UART, I2C and standard STEP & DIR signals.
 - By Using the I2C connector as well as the AUX connector you could daisy chain many PD Stepper boards together.
-- The standard Qwiic / Stemma QT I2C connector means you can connect a wide range of sensors which could be used for control (for example a [Rotary Encoder](https://www.adafruit.com/product/5880) or a [Light Sensor](https://www.adafruit.com/product/4162))
+- The standard Qwiic / Stemma QT I2C connector (4 pin JST SH) means you can connect a wide range of sensors which could be used for control (for example a [Rotary Encoder](https://www.adafruit.com/product/5880) or a [Light Sensor](https://www.adafruit.com/product/4162))
 
 - The 3 buttons on the side of the board can be set to control speed and/or position
 
 - Serial commands can be sent/received through the USB-C connector (Note if your device sending the commands cannot provide enough power you may need an injector of some kind)
 
 - The ESP32-S3 also has built in BLE (Bluetooth Low Energy) which could be used for control.
+
+- End stops can also be connected to the AUX Connector (3 pin JST SH)
 
 ## Setting the driver voltage ##
 The USB PD voltage can be set by toggling 3 GPIO pins on the ESP32. This can be configured on the fly to change voltage.
