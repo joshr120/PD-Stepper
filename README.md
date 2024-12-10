@@ -5,12 +5,14 @@ PD Stepper is a USB PD Powered Nema 17 stepper driver using the Silent Trinamic 
 
 <p float="left">
   <img src="https://github.com/joshr120/PD-Stepper/assets/120012174/70c9a55e-43c8-42c1-9540-dcf600ba0539" width="48%" />
-  <img src="https://github.com/joshr120/PD-Stepper/assets/120012174/e2fd122a-58a3-4d58-a0a7-cbbbc9104925" width="48%" /> 
+  <img src="https://github.com/user-attachments/assets/1d594941-e84c-44e8-9f2c-273dbbe360d2" width="48%" /> 
 </p>
 
+
+
 <p float="left">
-  <img src="https://github.com/joshr120/PD-Stepper/assets/120012174/65909313-01d8-4cda-bbda-bfbe47be087a" width="51%" />
-  <img src="https://github.com/joshr120/PD-Stepper/assets/120012174/ed572055-1679-4632-a867-deeb7a4562eb" width="37%" /> 
+  <img src="https://github.com/user-attachments/assets/c0fa1ab4-82ac-4a1e-87f9-4fefa437d6c6" width="48%" /> 
+  <img src="https://github.com/joshr120/PD-Stepper/assets/120012174/65909313-01d8-4cda-bbda-bfbe47be087a" width="48%" />
 </p>
 
 
