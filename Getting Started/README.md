@@ -74,9 +74,13 @@ Again ensure the PCB is installed in the orientation shown so the motor connecto
    
 **5.** From here you can use velocity/postion control and play around with different settings.
 
-**6.** For your own projects this code as well as others (such as ESPHome config) can be found [HERE](/Software)
+**6.** The current is set as a percentage of the maximum possible current (1.92A). You will want to set this to match the current rating of your motor (or lower to stay cooler) E.g for a 1.8A motor set to 90% as 90% * 1.92A = 1.73A
 
-**7.** The buttons on the side can also be used to change the velocity
+Note: When using the webserver example the value is set here and the potentiometer is ignored. When using the advanced ESPHome examples this can be set with by changing the `run_current` value.
+
+**7.** For your own projects this code as well as others (such as ESPHome config) can be found [HERE](/Software)
+
+**8.** The buttons on the side can also be used to change the velocity
 
 ## Trouble Shooting ##
 - The motor will not spin unless the board is receiving correct the voltage requested from the PD Source. So ensure your brick can supply the correct voltage. The requested voltage can be adjusted on the fly in the webserver.
