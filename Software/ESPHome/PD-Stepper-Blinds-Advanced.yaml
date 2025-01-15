@@ -52,10 +52,11 @@ esphome:
     - tmc2209.stallguard:
         threshold: 45   #set lower if stall gaurd triggering too often
     - tmc2209.currents:
-        irun: 4
         ihold: 0
         tpowerdown: 0
         iholddelay: 0
+        # irun: 16
+        run_current: 800m #Set your desired current here (800m = 800mA, 1 = 1A etc.)
         standstill_mode: freewheeling
 
      #set PD voltage    # 5V  9V  12V  15V  20V
