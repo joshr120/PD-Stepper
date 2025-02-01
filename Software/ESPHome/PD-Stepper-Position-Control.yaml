@@ -3,7 +3,7 @@
 
 external_components:
   - source: github://slimcdk/esphome-custom-components
-    components: [tmc2209, stepper]
+    components: [tmc2209_hub, tmc2209, stepper]
 
 globals:
   - id: encoder_tracking_
