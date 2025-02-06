@@ -3,7 +3,7 @@
 
 external_components:
   - source: github://slimcdk/esphome-custom-components
-    components: [tmc2209, stepper]
+    components: [tmc2209_hub, tmc2209, stepper]
 
 substitutions:
   encoder_closed_pos: "30000" # full blinds length (in encoder counts) !! CHANGE TO SUIT YOUR SETUP !!
