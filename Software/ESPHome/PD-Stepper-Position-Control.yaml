@@ -178,9 +178,10 @@ sensor:
     name: Encoder
     id: encoder
     update_interval: 0s # beware of the polling rate
+    internal: true # don't publish sensor data to Home Assistant or web server
     filters:
-      - delta: 2
-      # filter which computes absolute position from angle value
+      - delta: 2 # throttle the high polling rate to only act on value changes
+      # compute absolute position from angle value
       - lambda: |
           const uint16_t curr = x; //current encoder value 0-4095
           const uint16_t prev = id(encoder_tracking_)[0]; //previous encoder value 0-4095
@@ -193,6 +194,8 @@ sensor:
           }
           id(encoder_tracking_)[0] = curr;
           return id(encoder_tracking_)[1];
+      - multiply: -1.0
+      - throttle: 100ms # limit the amount of new sensor states from this component
     accuracy_decimals: 0
     state_class: measurement
 
