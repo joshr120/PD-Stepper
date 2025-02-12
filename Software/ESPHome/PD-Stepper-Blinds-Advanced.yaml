@@ -71,14 +71,6 @@ esphome:
     - lambda: id(sensored_home_pos) = id(encoder)->get_state();  # Set the home position to power on position
     # - button.press: home
 
-
-web_server:
-  include_internal: true
-  ota: false
-  version: 3
-  log: false
-
-
 i2c:
   sda: 8
   scl: 9
@@ -196,7 +188,7 @@ binary_sensor:
    filters:
      - delayed_on: 10ms
    on_press:
-     - tmc2209.disable: motor
+     - stepper.stop: motor
 
  - platform: gpio
    name: Button 3
@@ -224,6 +216,7 @@ sensor:
     name: Encoder
     id: encoder
     update_interval: 0s # beware of the polling rate
+    internal: true # don't publish sensor data to Home Assistant or web server
     filters:
       - delta: 2 # throttle the high polling rate to only act on value changes
       # compute absolute position from angle value
@@ -240,6 +233,7 @@ sensor:
           id(encoder_tracking_)[0] = curr;
           return id(encoder_tracking_)[1];
       - multiply: -1.0
+      - throttle: 250ms # limit the amount of new sensor states from this component
     accuracy_decimals: 0
     state_class: measurement
 
@@ -260,7 +254,7 @@ cover:
     # internal: true
     lambda: "return 1.0 - ((id(encoder)->get_state()-id(sensored_home_pos)) / ${encoder_closed_pos});"
     stop_action:
-      - tmc2209.disable: motor
+      - stepper.stop: motor
     open_action:
       - stepper.report_position:
           id: motor
