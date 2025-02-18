@@ -68,7 +68,7 @@ esphome:
         id: CFG3_pin
 
     - delay: 0.5s
-    - lambda: id(sensored_home_pos) = id(encoder)->get_state();  # Set the home position to power on position
+    - lambda: id(sensored_home_pos) = id(encoder)->get_state();  # Set the home (open) position to power on position
     # - button.press: home
 
 i2c:
@@ -220,6 +220,8 @@ sensor:
     filters:
       - delta: 2 # throttle the high polling rate to only act on value changes
       # compute absolute position from angle value
+
+      ########  NORMAL DIRECTION ########
       - lambda: |
           const uint16_t curr = x; //current encoder value 0-4095
           const uint16_t prev = id(encoder_tracking_)[0]; //previous encoder value 0-4095
@@ -232,6 +234,21 @@ sensor:
           }
           id(encoder_tracking_)[0] = curr;
           return id(encoder_tracking_)[1];
+
+      ########  REVERSE DIRECTION ######## (uncomment this instead of previous function if your motor is moving in reverse relvative to your encoder)
+      # - lambda: |
+      #     const uint16_t curr = x; // current encoder value 0-4095
+      #     const uint16_t prev = id(encoder_tracking_)[0]; // previous encoder value 0-4095
+      #     if (curr > 3000 && prev < 1000) {
+      #         id(encoder_tracking_)[1] += (4095 - curr + prev); // crossed zero clockwise (was decreasing, now increasing total)
+      #     } else if (curr < 1000 && prev > 3000) {
+      #         id(encoder_tracking_)[1] -= (4095 - prev + curr); // crossed zero counterclockwise (was increasing, now decreasing total)
+      #     } else {
+      #         id(encoder_tracking_)[1] -= (curr - prev);
+      #     }
+      #     id(encoder_tracking_)[0] = curr;
+      #     return id(encoder_tracking_)[1];
+      
       - multiply: -1.0
       - throttle: 250ms # limit the amount of new sensor states from this component
     accuracy_decimals: 0
