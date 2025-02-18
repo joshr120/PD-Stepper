@@ -1,6 +1,8 @@
 # **PD Stepper** - Getting Started
 If you just received your PD Stepper this will show you how to spin a motor and configure the driver using the firmware pre-installed on the board.
 
+⚠️ **Warning:** Stepper motors should never be back driven at a high speed as they can act as a generator and cause damage. This is especially important if your PD stepper board is connected directly to a computers USB port
+
 ## Assembling a kit onto a Nema 17 ##
 
 Timestamp 1:50 of [this video](https://youtu.be/qECEGUZE04s?t=110) also shows how to setup a Nema 17 with your kit.
