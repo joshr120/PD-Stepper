@@ -13,7 +13,12 @@ USB CDC on Boot should be set to "Enabled"
 
 
 ## ESPHome: ##
-The **PD-Stepper-Blinds-Advanced.yaml** config file uses the [custom TMC2209](https://github.com/slimcdk/esphome-custom-components/tree/master/esphome/components/tmc2209) component by [slimcdk](https://github.com/slimcdk). It also uses the AS5600 encoder so that if the blinds are manually moved it will not lose its end positions. Thanks to the custom componenet the example can also be modified to use stall gaurd for sensorless homing. PD voltage can be configured and it set an startup.
+The **PD-Stepper-Blinds-Advanced.yaml** config file uses the [custom TMC2209](https://github.com/slimcdk/esphome-custom-components/tree/master/esphome/components/tmc2209) component by [slimcdk](https://github.com/slimcdk). It also uses the AS5600 encoder so that if the blinds are manually moved it will not lose its end positions. Thanks to the custom componenet the example can also be modified to use stall gaurd for sensorless homing. PD voltage can be configured and it set an startup. 
+> By default this will use the power on position as the OPEN position.
+
+> If the motor spins but the cover stays in the "open" position it means either your encoder is not working or your motor is spinning in the opposite direction releative to your encoder. You can swap which lambda function is commneted out to reverse the encoder direction. 
+
+> You can enable sensorless homeing (Stallguard) by uncommenting line 129, you may need to tune the threshold and current values to get this to work well.
 
 The **PD-Stepper-Blinds-Simple.yaml** config file simply treats the TMC2209 as a a4988 driver. The microsteps and PD voltage are set at startup by GPIO pins and the motor is driven via the STEP and DIR pins.
 
