@@ -111,4 +111,4 @@ When programming the board it is likely your computer will only be able to provi
 NOTE: You must use a USB PD power brick/power bank which can provide the required voltage and current along with a suitable USB-C cable. QC (Quick Charge) is not currently supported.
 
 ## Setting the driver Current ##
-The motor current can be set either in hardware with the onboard potentiometer or over the TMC2209 serial interface (see the [TMC2209 library](https://github.com/janelia-arduino/TMC2209) for for info on serial comms)
+The motor current can be set either in hardware with the onboard potentiometer or over the TMC2209 serial interface (see the [TMC2209 library](https://github.com/janelia-arduino/TMC2209) for more info on serial comms)
