@@ -159,7 +159,7 @@ void runMotor(){
       } else {
         lastState = 0;
       }
-      }
+    }
   } else{
     digitalWrite(TMC_EN, HIGH); //disable stepper as voltage not as expected (should really only do this on state change)
   }
