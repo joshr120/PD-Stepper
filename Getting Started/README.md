@@ -66,7 +66,7 @@ Again ensure the PCB is installed in the orientation shown so the motor connecto
 <br>
 
 ## Running the Webserver ##
-**1.** Connect the PD Stepper to your PD power supply.
+**1.** Connect the PD Stepper to your PD power supply using a USB C to C cable (Needs to be Type C as USB PD does not support Type A).
 
 **2.** Open a phone/computer and connect to the WiFi network named "PD Stepper"
 
