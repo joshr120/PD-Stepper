@@ -40,6 +40,8 @@ Again ensure the PCB is installed in the orientation shown so the motor connecto
 <img src="https://github.com/user-attachments/assets/422a96af-25d4-471b-8eb3-9a04f6864500" width="40%" />
 <img src="https://github.com/user-attachments/assets/50db331a-7b4e-4453-b08a-cd70c9577580" width="40%" />
 
+Note: Some motors may have longer shafts that make the magnet sit higher. If the sensor contacts the magnet, add spacers to raise the PCB.
+
 ### 5. Add the cover and new countersunk screws
 
    The included screws are best suited for a 34mm length Nema 17 you may need longer or shorter ones depending on your motor. (included ones are M3x40mm)
