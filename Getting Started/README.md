@@ -87,4 +87,6 @@ Note: When using the webserver example the value is set here and the potentiomet
 **8.** The buttons on the side can also be used to change the velocity
 
 ## Trouble Shooting ##
-- The motor will not spin unless the board is receiving correct the voltage requested from the PD Source. So ensure your brick can supply the correct voltage. The requested voltage can be adjusted on the fly in the webserver.
+- The motor will not spin unless the board is receiving correct the voltage requested from the PD Source. So ensure your brick can supply the correct voltage and supports USB PD. The requested voltage can be adjusted on the fly in the webserver.
+- If the "PG Status" is showing "Power Bad" ensure you are using a USB PD power supply (greater than 45W preffered) and that you are using a Type C to C cable.
+- If the motor is not spinning smoothly, power off the board and try the other motor cable provided in the kit.
