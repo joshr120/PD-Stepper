@@ -282,7 +282,7 @@ const char index_html[] PROGMEM = R"rawliteral(
         <span id="voltage">Loading</span>
         <br>
         <br>
-        <span class="stat-labels">PD Status:</span>
+        <span class="stat-labels">USB PD Status:</span>
         <span id="powergood">Loading</span>
         <br>
         <br>
@@ -402,7 +402,7 @@ const char index_html[] PROGMEM = R"rawliteral(
         <span class="slider round"></span>
       </label>
       <br>
-      <input type='range' class='slider1' id='slider' min='-320' max='320' value='0' oninput='updateSlider()' onpointerup='checkReset()'>
+      <input type='range' class='slider1' id='slider' min='-320' max='320' value='0' oninput='throttledUpdate()' onpointerup='checkReset()'>
    </div>   
    
    <hr>
@@ -527,8 +527,19 @@ const char index_html[] PROGMEM = R"rawliteral(
     xhttp.open("GET", "/stallguard", true);
     xhttp.send();
   }, 150 ) ;
+
+
+  /* Throttle sending rate */
+  let lastCall = 0;
+  const throttleTimeout = 100; 
   
-  
+  function throttledUpdate() {
+    const now = new Date().getTime();
+    if (now - lastCall < throttleTimeout) return; // Skip if too soon
+    lastCall = now;
+    updateSlider();
+  }
+    
   
   /* Scripts for velocity toggle and slider */
   var resetEnabled = false;

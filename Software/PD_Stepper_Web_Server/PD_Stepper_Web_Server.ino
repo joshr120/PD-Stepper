@@ -19,23 +19,17 @@
 
 
 #include <WiFi.h>
-#include <ESPAsyncWebServer.h> // https://github.com/me-no-dev/ESPAsyncWebServer
-#include <AsyncTCP.h>  //https://github.com/me-no-dev/AsyncTCP
-
-//#include <ESPmDNS.h>
-
+#include <ESPAsyncWebServer.h> // https://github.com/ESP32Async/ESPAsyncWebServer (ENSURE THIS VERSION IS USED)
+#include <AsyncTCP.h>  //https://github.com/ESP32Async/AsyncTCP/tree/main (ENSURE THIS VERSION IS USED)
 #include <TMC2209.h> //  https://github.com/janelia-arduino/TMC2209/tree/main
-
 #include <Preferences.h> //for saving to flash (instead of old EEPROM lib)
+#include "index_html.h"
 
 Preferences preferences;
-
 
 //access point SSID and password (password = "" for no password)
 const char *ssid = "PD Stepper";
 const char *password = "";
-
-#include "index_html.h"
 
 AsyncWebServer server(80);
 
@@ -112,6 +106,12 @@ String current = "30";
 String stallThreshold = "10";
 String standstillMode = "NORMAL";
 
+//variable updated in callback
+volatile bool speedUpdatePending = false;
+volatile int pendingSpeed = 0;
+volatile bool posUpdatePending = false;
+volatile int pendingPosMode = 0;
+
 //Varaiables for position control (open loop)
 signed long setPoint = 0;
 signed long CurrentPosition = 0;
@@ -127,11 +127,23 @@ String readPGState(){
   }
 }
 
-//read VBUS voltage to display on webpage
-String readVoltage(){
-  int ADCValue = analogRead(VBUS);
-  VBusVoltage = ADCValue * (VREF / 4096.0) / DIV_RATIO;
-  return String(VBusVoltage)+"V";
+// read VBUS voltage to display on webpage
+String readVoltage() {
+  uint32_t mvSum = 0;
+  int samples = 10; // Average 10 readings to smooth out electrical noise
+
+  for (int i = 0; i < samples; i++) {
+    mvSum += analogReadMilliVolts(VBUS);
+  }
+
+  float avgMilliVolts = (float)mvSum / (float)samples;
+  
+  // avgMilliVolts / 1000.0 = Actual voltage at the ESP32 pin
+  // Dividing by DIV_RATIO scales it back up to the battery/VBUS voltage
+  VBusVoltage = (avgMilliVolts / 1000.0) / DIV_RATIO;
+
+  // Returning with 2 decimal places for better readability
+  return String(VBusVoltage, 2) + "V";
 }
 
 //read encoder pos to display on webpage
@@ -226,11 +238,13 @@ void setup() {
   pinMode(DIAG, INPUT);
   digitalWrite(TMC_EN, LOW); //Enabled here and later enabled/disabled over UART
 
-  digitalWrite(MS1, LOW); //used to set serial address in UART mode
   digitalWrite(MS2, LOW);
 
   //AS5600 Hall Encoder Setup
   Wire.begin(SDA, SCL);  //start wire with earlier defined pins
+
+  //ADC Setup
+  analogSetPinAttenuation(VBUS, ADC_11db);
 
   readSettings(); //get saved values from EEPROM
   
@@ -278,32 +292,17 @@ void setup() {
   // Route to handle slider position update
   server.on("/update", HTTP_POST, [](AsyncWebServerRequest *request) {
     if (request->hasParam("slider", true)) {
-      AsyncWebParameter* sliderParam = request->getParam("slider", true);
-      String sliderValue = sliderParam->value();
-      set_speed = sliderValue.toInt(); //convert to int
-      Serial.println("Slider value: " + sliderValue);
-      if (digitalRead(PG)==0){ //only move if PG is good
-        stepper_driver.moveAtVelocity(set_speed*(microsteps.toInt()));
-      }
-      stepper_driver.moveAtVelocity(set_speed*(microsteps.toInt()));
+      const AsyncWebParameter* p = request->getParam("slider", true);
+      pendingSpeed = p->value().toInt();
+      speedUpdatePending = true; // Signal the loop to update velocity
     }
-
-    if (request->hasParam("positionControl", true)) {  //should not move directly here, raise a flag or setpoint instead!!!
-      AsyncWebParameter* sliderParam = request->getParam("positionControl", true);
-      String posValue = sliderParam->value();
-      stepper_driver.moveAtVelocity(0); //stop moving incase still moving from velocity control mode
-      
-      if (posValue == "1"){
-        setPoint -= 25600; //must be factor of 256 due to how the microsteping calcs work
-      } else if (posValue == "2"){
-        setPoint -= 12800;
-      } else if (posValue == "3"){
-        setPoint += 12800;
-      } else if (posValue == "4"){
-        setPoint += 25600;
-      } 
+  
+    if (request->hasParam("positionControl", true)) {
+      const AsyncWebParameter* p = request->getParam("positionControl", true);
+      pendingPosMode = p->value().toInt();
+      posUpdatePending = true; // Signal the loop to update position
     }
-    request->send(200); // Respond with HTTP 200 OK
+    request->send(200);
   });
 
   //handle post request of saving form
@@ -353,6 +352,22 @@ void setup() {
 
 void loop() {
 
+  //Handle WebServer hardware requests safely in the main thread
+  if (speedUpdatePending) {
+    set_speed = pendingSpeed;
+    stepper_driver.moveAtVelocity(set_speed * (microsteps.toInt()));
+    speedUpdatePending = false;
+  }
+
+  if (posUpdatePending) {
+    stepper_driver.moveAtVelocity(0); // Stop velocity mode
+    if (pendingPosMode == 1)      setPoint -= 25600;
+    else if (pendingPosMode == 2) setPoint -= 12800;
+    else if (pendingPosMode == 3) setPoint += 12800;
+    else if (pendingPosMode == 4) setPoint += 25600;
+    posUpdatePending = false;
+  }
+
   if (millis() - lastEncRead >= mainFreq){ //main loop
     lastEncRead = millis();
     //readEncoder(); //need to constantly read encoder in order to catch wrap around
@@ -370,7 +385,6 @@ void loop() {
   }
 
   
-
   //position control done here (open-loop for now)
   int delaySpeed = 4500; //delay speed smaller value = faster
   int microSteps = microsteps.toInt();

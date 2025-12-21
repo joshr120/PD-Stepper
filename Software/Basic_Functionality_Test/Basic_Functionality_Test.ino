@@ -116,6 +116,9 @@ void setup() {
   digitalWrite(LED1, LOW);
   digitalWrite(LED2, LOW);
 
+  //ADC Setup
+  analogSetPinAttenuation(VBUS, ADC_11db);
+
   delay(500); //delay needed before "Serial.begin" to ensure bootloader mode entered correctly. Otherwise bootloader mode may need to be manually entered by holding BOOT, press RST, release BOOT
   Serial.begin(115200);
   Serial.println("Code Starting");
@@ -166,11 +169,21 @@ void runMotor(){
 }
 
 //read and output voltage as well as PG status from PD trigger
-void readVoltage(){
-  int ADCValue = analogRead(VBUS);
-  VBusVoltage = ADCValue * (VREF / 4096.0) / DIV_RATIO;
-  PGState = digitalRead(PG); //Low = power good!
+void readVoltage() {
+  uint32_t mvSum = 0;
+  int samples = 20; // Average 20 readings to stabilize the Serial output
 
+  for (int i = 0; i < samples; i++) {
+    mvSum += analogReadMilliVolts(VBUS);
+    delayMicroseconds(100); 
+  }
+
+  float avgMilliVolts = (float)mvSum / (float)samples;
+  
+  // Convert millivolts to Volts and apply the divider ratio
+  VBusVoltage = (avgMilliVolts / 1000.0) / DIV_RATIO;
+  
+  PGState = digitalRead(PG); // Low = power good!
 
   Serial.print("Voltage Read: ");
   Serial.print(VBusVoltage);
