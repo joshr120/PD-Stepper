@@ -34,7 +34,7 @@ There is a great online tool called [ESPConnect](https://thelastoutpostworkshop.
 
 The following steps will show you how to flash the default webserver example.
 
-**1.** Plug the PD Stepper into a PC, Open [ESPConnect](https://thelastoutpostworkshop.github.io/microcontroller_devkit/espconnect/) and press.
+**1.** Plug the PD Stepper into a PC, Open [ESPConnect](https://thelastoutpostworkshop.github.io/microcontroller_devkit/espconnect/) and press Connect.
 <img width="2000" height="1202" alt="image (3)" src="https://github.com/user-attachments/assets/3e089ffc-9281-483f-aab2-36b9300187c6" />
 
 <br>
