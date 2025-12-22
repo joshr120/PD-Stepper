@@ -28,3 +28,33 @@ The **PD-Stepper-Position-Control.yaml** config also uses the [custom TMC2209](h
 
 These examples also present the buttons, LEDs, power good and bus voltages to the ESPHome interface so you can do what you like with them.
 
+## Flashing a precompiled binary online: ##
+
+There is a great online tool called [ESPConnect](https://thelastoutpostworkshop.github.io/microcontroller_devkit/espconnect/) which can be used to flash the board without downloading any software. 
+
+The following steps will show you how to flash the default webserver example.
+
+**1.** Plug the PD Stepper into a PC, Open [ESPConnect](https://thelastoutpostworkshop.github.io/microcontroller_devkit/espconnect/) and press.
+<img width="2000" height="1202" alt="image (3)" src="https://github.com/user-attachments/assets/3e089ffc-9281-483f-aab2-36b9300187c6" />
+
+<br>
+<br>
+
+**2.** Select your board, COM number will be different but naming will be similar.
+<img width="1416" height="872" alt="image (4)" src="https://github.com/user-attachments/assets/8eacb15c-e09e-4f5a-b8cb-4a20376150bb" />
+
+<br>
+<br>
+
+**3.** Go to the "Flash Tools" page and select the `PD_Stepper_Web_Server.bin` file (Download from [here](https://github.com/joshr120/PD-Stepper/tree/main/Software/PD_Stepper_Web_Server)).
+<img width="1965" height="1118" alt="image (5)" src="https://github.com/user-attachments/assets/2dfecb2d-70da-4b6d-8ea1-3ebc5cee3f08" />
+
+<br>
+<br>
+
+**4.** Press flash and confirm
+<img width="1685" height="437" alt="image (6)" src="https://github.com/user-attachments/assets/19edbe0c-8bba-4d89-b0dd-221bea48778e" />
+
+<br>
+
+Feel free to reach out at [info@thingsbyjosh.com](info@thingsbyjosh.com) if you have any problems.
