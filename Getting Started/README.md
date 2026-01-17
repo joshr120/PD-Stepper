@@ -5,7 +5,10 @@ If you just received your PD Stepper this will show you how to spin a motor and 
 
 ## Assembling a kit onto a Nema 17 ##
 
-Timestamp 1:50 of [this video](https://youtu.be/qECEGUZE04s?t=110) also shows how to setup a Nema 17 with your kit.
+Assembly is also shown in [this video](https://www.youtube.com/shorts/9y9dA18rnVY).
+
+For easiest assembly your motor should have the stardard 6 pin JST PH connector, and the included screws (M3x40mm) are best suited for a 34mm length motor.
+For example the Hanpose 17HS3401S, available on [Amazon](https://www.amazon.com/Captive-Stepper-17HS3401S-4-Lead-Printer/dp/B0G9KRJFTY) and [Aliexpress](https://www.aliexpress.com/item/1005006577156384.html).
 
 ### 1. Install the magnet onto your motor (only needed for reading encoder position)
    
