@@ -1,6 +1,13 @@
 # This example uses a custom TMC2209 component to control the PD Stepper
 # It uses the encoder to get the current blind position so it will not lose home if blind is manually moved
 
+# If the motor stalls it stops the motor and sets this as the new home/OPEN position
+
+# The "Home" button tries to move the blind up 120% of the set length and once a stall is detected it set this as the new home position (you may need to tune the stall theshold for you setup)
+# This can be enabled at boot by un-commenting line 79.
+
+# The stall feature can be disabled by commenting out line 135 & 136
+
 external_components:
   - source: github://slimcdk/esphome-custom-components
     components: [tmc2209_hub, tmc2209, stepper]
@@ -125,8 +132,8 @@ stepper:
     # dir_pin: 6
     on_stall:
       - logger.log: "Motor stalled!"
-      # - stepper.stop: motor #un-comment this to disable on stall
-      # - lambda: id(sensored_home_pos) = id(encoder)->get_state();  #un-comment this to not reset home on stall
+      - stepper.stop: motor #disables the motor on a stallGuard event
+      - lambda: id(sensored_home_pos) = id(encoder)->get_state();  #This set sets the new home position to the stalled position
       - cover.template.publish:
           id: pd_blinds
           state: OPEN
@@ -148,7 +155,10 @@ button:
     on_press:
       - stepper.set_target:
           id: motor
-          target: -${encoder_closed_pos}
+          # 1.2 * encoder_closed_pos makes it travel 120% of the distance to ensure home is hit and a motor stall forces the new home position.
+          # The negative sign ensures it moves toward the "Home/Open" direction.
+          target: !lambda |-
+            return -1.2 * ${encoder_closed_pos};
 
   - platform: template
     name: Stop
