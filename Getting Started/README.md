@@ -93,7 +93,7 @@ Note: When using the webserver example the value is set here and the potentiomet
 - The motor will not spin unless the board is receiving correct the voltage requested from the PD Source. So ensure your brick can supply the correct voltage and supports USB PD. The requested voltage can be adjusted on the fly in the webserver.
 - If the "PG Status" is showing "Power Bad" ensure you are using a USB PD power supply (greater than 45W preffered) and that you are using a Type C to C cable.
 - If the motor is not spinning smoothly, power off the board and try the other motor cable provided in the kit.
-- If no WiFi network is created and LED 1 (blue) does not blink at startup, the correct software may not be installed. There are two ways to load the web server software:
+- If no WiFi network is created and LED 1 (blue) does not blink at startup, the correct software may not be installed. There are two ways to load the latest web server example software:
 
     The simplest method is to flash the precompiled binary using an online tool. See the instructions at the bottom of [this page](https://github.com/joshr120/PD-Stepper/tree/main/Software)
 
