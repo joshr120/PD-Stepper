@@ -1,8 +1,6 @@
-# PD Stepper Controller: Serial Control Guide
+# PD Stepper: Serial Control Guide
 
-This project allows for high-speed, precise control of a TMC2209-driven stepper motor via a unified serial command protocol.
-
----
+Upload the Serial_Control.ino script to control your PD Stepper over serial.
 
 ## Connection Options
 
