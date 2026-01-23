@@ -270,15 +270,31 @@ void readSerialCommands(Stream &port) {
   String cmd = port.readStringUntil('\n');
   cmd.trim();
 
+  if (cmd.length() == 0) {
+    return; // Exit immediately if the line is empty
+  }
+
   if (cmd.startsWith("deg=")) {
     float targetAngle = cmd.substring(4).toFloat();
     setPoint = (targetAngle/360.0) * stepsPerRev * 256; 
-    signed long posMicrosteps = (stepsPerRev * 256 * (total_encoder_counts-encoder_offset)) / 4096.0;
-    microsteps_to_move = setPoint - posMicrosteps; 
+    signed long posMicrosteps = (stepsPerRev * 256 * (total_encoder_counts-encoder_offset)) / 4096.0; //gets current pos (should be moved to loop)
+    microsteps_to_move = setPoint - posMicrosteps; //not used for open loop control
     if (verboseOutput) {
       port.print("SUCCESS: Target angle set to: ");
       port.println(targetAngle);
     }
+    return;
+  }
+  if (cmd.startsWith("deg_rel=")) {
+    float relAngle = cmd.substring(8).toFloat();
+    setPoint += (relAngle/360.0) * stepsPerRev * 256; 
+    signed long posMicrosteps = (stepsPerRev * 256 * (total_encoder_counts-encoder_offset)) / 4096.0;
+    microsteps_to_move = setPoint - posMicrosteps; 
+    if (verboseOutput) {
+      port.print("SUCCESS: Target angle increased by: ");
+      port.println(relAngle);
+    }
+    return;
   }
   else if (cmd.startsWith("vel=")) {
     float motorSpeed = cmd.substring(4).toFloat();
@@ -288,6 +304,7 @@ void readSerialCommands(Stream &port) {
       port.print("SUCCESS: Speed set to: ");
       port.println(motorSpeed);
     }
+    return;
   }
   else if (cmd.startsWith("steps_per_rev=")) {
     int stepsPerRevRec = cmd.substring(14).toInt();
@@ -301,6 +318,7 @@ void readSerialCommands(Stream &port) {
     } else {
       port.println("ERROR: Steps per revolution must be 200 or 400 ");
     }
+    return;
   }
   else if (cmd.startsWith("enable=")) {
     String enableRec = cmd.substring(7);
@@ -315,6 +333,7 @@ void readSerialCommands(Stream &port) {
     } else {
       port.println("ERROR: Enable must be set to 0, 1, FALSE or TRUE");
     }
+    return;
   }
   else if (cmd.startsWith("microsteps=")) {
     int microstepsRec = cmd.substring(11).toInt();
@@ -329,6 +348,7 @@ void readSerialCommands(Stream &port) {
     } else {
       port.println("ERROR: microsteps must be 1, 4, 8, 16, 32, 64, 128 or 256");
     }
+    return;
   }
   else if (cmd.startsWith("voltage=")) {
     int setVoltageRec = cmd.substring(8).toInt();
@@ -342,6 +362,7 @@ void readSerialCommands(Stream &port) {
     } else {
       port.println("ERROR: Voltage must be 5, 9, 12, 15 or 20");
     }
+    return;
   }
   else if (cmd.startsWith("current=")) {
     int currentRec = cmd.substring(8).toInt();
@@ -356,6 +377,7 @@ void readSerialCommands(Stream &port) {
     } else {
       port.println("ERROR: Current needs to be a value from 0-100");
     }
+    return;
   }
   else if (cmd.startsWith("speed=")) {
     float speedRec = cmd.substring(6).toFloat();
@@ -369,6 +391,7 @@ void readSerialCommands(Stream &port) {
     } else {
       port.println("ERROR: Position speed must be between 0 and 5000 deg/s");
     }
+    return;
   }
   else if (cmd.startsWith("standstill_mode=")) {
     String standstillModeRec = cmd.substring(16);
@@ -383,6 +406,7 @@ void readSerialCommands(Stream &port) {
     } else {
       port.println("ERROR: Standstill mode must be NORMAL, FREEWHEELING, BRAKING or STRONG_BRAKING");
     }
+    return;
   }
   else if (cmd.startsWith("closed_loop_type=")) {
     String closedLoopTypeRec = cmd.substring(17);
@@ -396,6 +420,7 @@ void readSerialCommands(Stream &port) {
     } else {
       port.println("ERROR: MOVE_FROM_ENC must be OPEN_LOOP, MOVE_FROM_ENC Or CLOSED_LOOP");
     }
+    return;
   }
   else if (cmd.startsWith("mappingDirection=")) {
     int mappingDirectionRec = cmd.substring(17).toInt();
@@ -409,6 +434,7 @@ void readSerialCommands(Stream &port) {
     } else {
       port.println("ERROR: Mapping direction must be 0 or 1");
     }
+    return;
   }
   else if (cmd.startsWith("verboseOutput=")) {
     String verboseOutputRec = cmd.substring(14);
@@ -422,10 +448,12 @@ void readSerialCommands(Stream &port) {
     } else {
       port.println("ERROR: verbose output must be set to 0, 1, FALSE or TRUE");
     }
+    return;
   }
   else if (cmd.equalsIgnoreCase("HELP")) {
     port.println("\nList of available commands:");
     port.println("deg= xxx.x          : move to position, in degrees");
+    port.println("deg_rel= xxx.x      : relative move to position, in degrees");
     port.println("vel= xxxx           : spin at set velocity");
     port.println("steps_per_rev= xxx  : Steps per revolution, 200 or 400");
     port.println("enable= x           : enable/disable driver, 0 or 1");
@@ -440,6 +468,7 @@ void readSerialCommands(Stream &port) {
     port.println("values              : output current setup");
     port.println("led_flash           : flash LED1 twice");
     port.println("get_angle           : return current angle in degrees\n");
+    return;
   }
   else if (cmd.equalsIgnoreCase("VALUES")) {
     port.println("\nCurrent Driver Setup:");
@@ -454,17 +483,23 @@ void readSerialCommands(Stream &port) {
     port.print("mappingDirection = "); port.println(mappingDirection);
     port.print("verboseOutput = "); port.println(verboseOutput);
     port.println("");
+    return;
   }
   else if (cmd.equalsIgnoreCase("led_flash")) {
     digitalWrite(LED1, HIGH); delay(300); digitalWrite(LED1, LOW);
     delay(200);
     digitalWrite(LED1, HIGH); delay(300); digitalWrite(LED1, LOW);
+    return;
   }
   else if (cmd.equalsIgnoreCase("get_angle")) {
     port.println(angle);
+    return;
   }
   else {
-    port.println("ERROR: Unknown command, enter 'help' for a list of commands");
+    // port.println("ERROR: Unknown command, enter 'help' for a list of commands");
+    port.print("ERROR: Unknown command [");
+    port.print(cmd); // This will show you exactly what hidden char is causing it
+    port.println("], enter 'help' for a list of commands");
   }
 }
 

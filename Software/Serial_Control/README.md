@@ -47,6 +47,7 @@ This allows the system to remain accurate even if the motor was moved by hand wh
 | Command | Data Type | Description |
 | :--- | :--- | :--- |
 | `deg=` | Float | **Switch to Position Mode:** Move to absolute angle. |
+| `deg_rel=` | Float | **Switch to Position Mode:** Relative move to absolute angle. (add or subtracts from current setpoint) |
 | `speed=` | Float | Set travel speed for `deg=` movements (deg/s). |
 | `vel=` | Float | **Switch to Velocity Mode:** Spin at fixed rate (deg/s). |
 | `steps_per_rev=` | Int | Set motor physical steps (200 or 400). |
