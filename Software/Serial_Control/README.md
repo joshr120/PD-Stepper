@@ -11,10 +11,11 @@ The controller supports dual-input serial communication. You can send commands t
 * **Baud Rate:** 115200
 
 ### 2. AUX Connector (`Serial1`)
-* **Physical Port:** AUX1 and AUX2 header pins.
+* **Physical Port:** AUX connector (3 pin JST SH connector).
 * **Pins:**
-    * **AUX1 (TX):** Transmits data from the ESP32.
-    * **AUX2 (RX):** Receives data into the ESP32.
+    * **Pin 1 (GND):** Ground pin.
+    * **Pin 2 (AUX1 - TX):** Transmits data from the ESP32.
+    * **Pin 3 (AUX2 - RX):** Receives data into the ESP32.
 * **Baud Rate:** 115200
 
 ---
