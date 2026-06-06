@@ -30,7 +30,7 @@ For example the Hanpose 17HS3401S, available on [Amazon](https://www.amazon.com/
 <img src="https://github.com/user-attachments/assets/4cc5557a-db9c-483b-81b6-23050e741b87" width="40%" />
 <img src="https://github.com/user-attachments/assets/488c5d0f-4e0d-451d-9b88-532666b6c4e1" width="40%" />
 
-### 4. Place the spacer onto the motor ensuring it is in the orinentaion show
+### 4. Place the spacer onto the motor ensuring it is in the orientation show
 
 Note. If you are not using the heatspreader/spacer (partial kit) ensure the board is not resting directly on the motor as this could short out the traces on the underside of the PCB. Use washers or an insualting layer.
 
