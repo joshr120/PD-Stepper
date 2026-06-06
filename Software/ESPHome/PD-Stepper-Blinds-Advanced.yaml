@@ -4,17 +4,30 @@
 # If the motor stalls it stops the motor and sets this as the new home/OPEN position
 
 # The "Home" button tries to move the blind up 120% of the set length and once a stall is detected it set this as the new home position (you may need to tune the stall theshold for you setup)
-# This can be enabled at boot by un-commenting line 79.
+# This can be enabled at boot by setting home_on_boot to "true" in the substitutions block.
 
-# The stall feature can be disabled by commenting out line 135 & 136
+
+###################################
+#########    SETTINGS   ###########
+###################################
+substitutions:
+  #main settings you may want to change for your setup:
+  device_name: "pd-stepper-blinds"     # ESPHome device name
+  encoder_closed_pos: "30000"          # full blinds length (in encoder counts) !! CHANGE TO SUIT YOUR SETUP !!
+  encoder_invert: "false"              # set to "true" to invert the encoder direction mapping
+  stall_threshold: "10"                # lower = more sensitive, raise if stall triggering too often
+
+  #additonal settings for different behaviours: 
+  stall_resets_home: "true"            # set to "false" to disable stall homing behaviour (motor will still stop on stall)
+  stall_stops_motor: "true"            # set to "false" to disable motor stop on stall
+  home_on_boot: "false"                # set to "true" to automatically home the blind on boot
+
+
+
 
 external_components:
   - source: github://slimcdk/esphome-custom-components
     components: [tmc2209_hub, tmc2209, stepper]
-
-substitutions:
-  encoder_closed_pos: "30000" # full blinds length (in encoder counts) !! CHANGE TO SUIT YOUR SETUP !!
-  stepper_encoder_ratio: "0.195" # ratio between stepper microstepping (4) and encoder. 4 x 200 / 4096 = 0.195
 
 globals:
   - id: encoder_tracking_
@@ -47,7 +60,7 @@ esp32:
     type: esp-idf
 
 esphome:
-  name: pd-stepper-blinds-2
+  name: ${device_name}
   platformio_options:
     board_build.flash_mode: dio
     upload_speed: 921600
@@ -57,7 +70,7 @@ esphome:
         interpolation: true
         tcool_threshold: 400
     - tmc2209.stallguard:
-        threshold: 45   #set lower if stall gaurd triggering too often
+        threshold: ${stall_threshold}
     - tmc2209.currents:
         ihold: 0
         tpowerdown: 0
@@ -76,7 +89,11 @@ esphome:
 
     - delay: 0.5s
     - lambda: id(sensored_home_pos) = id(encoder)->get_state();  # Set the home (open) position to power on position
-    # - button.press: home
+    - if:
+        condition:
+          lambda: return ${home_on_boot};
+        then:
+          - button.press: home
 
 i2c:
   sda: 8
@@ -132,11 +149,22 @@ stepper:
     # dir_pin: 6
     on_stall:
       - logger.log: "Motor stalled!"
-      - stepper.stop: motor #disables the motor on a stallGuard event
-      - lambda: id(sensored_home_pos) = id(encoder)->get_state();  #This set sets the new home position to the stalled position
-      - cover.template.publish:
-          id: pd_blinds
-          state: OPEN
+      - if:
+          condition:
+            lambda: return ${stall_stops_motor};
+          then:
+            - stepper.stop: motor
+      - lambda: |-
+          if (${stall_resets_home}) {
+            id(sensored_home_pos) = id(encoder)->get_state();
+          }
+      - if:
+          condition:
+            lambda: return ${stall_resets_home};
+          then:
+            - cover.template.publish:
+                id: pd_blinds
+                state: OPEN
       - light.turn_on:
           id: led1
           transition_length: 0s
@@ -245,21 +273,7 @@ sensor:
           id(encoder_tracking_)[0] = curr;
           return id(encoder_tracking_)[1];
 
-      ########  REVERSE DIRECTION ######## (uncomment this instead of previous function if your motor is moving in reverse relvative to your encoder)
-      # - lambda: |
-      #     const uint16_t curr = x; // current encoder value 0-4095
-      #     const uint16_t prev = id(encoder_tracking_)[0]; // previous encoder value 0-4095
-      #     if (curr > 3000 && prev < 1000) {
-      #         id(encoder_tracking_)[1] += (4095 - curr + prev); // crossed zero clockwise (was decreasing, now increasing total)
-      #     } else if (curr < 1000 && prev > 3000) {
-      #         id(encoder_tracking_)[1] -= (4095 - prev + curr); // crossed zero counterclockwise (was increasing, now decreasing total)
-      #     } else {
-      #         id(encoder_tracking_)[1] -= (curr - prev);
-      #     }
-      #     id(encoder_tracking_)[0] = curr;
-      #     return id(encoder_tracking_)[1];
-      
-      - multiply: -1.0
+      - multiply: 1.0
       - throttle: 250ms # limit the amount of new sensor states from this component
     accuracy_decimals: 0
     state_class: measurement
@@ -279,27 +293,30 @@ cover:
     has_position: true
     assumed_state: false
     # internal: true
-    lambda: "return 1.0 - ((id(encoder)->get_state()-id(sensored_home_pos)) / ${encoder_closed_pos});"
+    lambda: |-
+      float pos = (id(encoder)->get_state() - id(sensored_home_pos)) / ${encoder_closed_pos};
+      return ${encoder_invert} ? 1.0 - pos : pos;
     stop_action:
       - stepper.stop: motor
+    # 0.195 below is a fixed hardware constant: microsteps x steps/rev / encoder counts = 4 x 200 / 4096
     open_action:
       - stepper.report_position:
           id: motor
-          position: !lambda return (1.0-id(pd_blinds)->position) * ${encoder_closed_pos} * ${stepper_encoder_ratio};
+          position: !lambda return (1.0-id(pd_blinds)->position) * ${encoder_closed_pos} * 0.195;
       - stepper.set_target:
           id: motor
           target: 0
     close_action:
       - stepper.report_position:
           id: motor
-          position: !lambda return (1.0-id(pd_blinds)->position) * ${encoder_closed_pos} * ${stepper_encoder_ratio};
+          position: !lambda return (1.0-id(pd_blinds)->position) * ${encoder_closed_pos} * 0.195;
       - stepper.set_target:
           id: motor
-          target: !lambda return ${encoder_closed_pos} * ${stepper_encoder_ratio} * 1.01;
+          target: !lambda return ${encoder_closed_pos} * 0.195 * 1.01;
     position_action:
       - stepper.report_position:
           id: motor
-          position: !lambda return (1.0-id(pd_blinds)->position) * ${encoder_closed_pos} * ${stepper_encoder_ratio};
+          position: !lambda return (1.0-id(pd_blinds)->position) * ${encoder_closed_pos} * 0.195;
       - stepper.set_target:
           id: motor
-          target: !lambda return (1.0-pos) * ${encoder_closed_pos} * ${stepper_encoder_ratio};
+          target: !lambda return (1.0-pos) * ${encoder_closed_pos} * 0.195;
