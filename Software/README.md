@@ -15,12 +15,12 @@ USB CDC on Boot should be set to "Enabled"
 ## ESPHome: ##
 >If you have not used ESPHome before follow the offical [getting started guide](https://esphome.io/guides/getting_started_hassio.html). Select ESP32-S3 as the board type. The custom .yaml can then be copied from the repo into the configuration editor. Ensure you also add you WiFi SSID and password to your "Secrets".
 
-The **PD-Stepper-Blinds-Advanced.yaml** config file uses the [custom TMC2209](https://github.com/slimcdk/esphome-custom-components/tree/master/esphome/components/tmc2209) component by [slimcdk](https://github.com/slimcdk). It also uses the AS5600 encoder so that if the blinds are manually moved it will not lose its end positions. Thanks to the custom componenet the example can also be modified to use stall gaurd for sensorless homing. PD voltage can be configured and it set an startup. 
-> By default this will use the power on position as the OPEN position.
+The **PD-Stepper-Blinds-Advanced.yaml** config file uses the [custom TMC2209](https://github.com/slimcdk/esphome-custom-components/tree/master/esphome/components/tmc2209) component by [slimcdk](https://github.com/slimcdk). It also uses the AS5600 encoder so that if the blinds are manually moved it will not lose its end positions. Thanks to the custom componenet the example cuses stall gaurd for sensorless homing. PD voltage and other settings can easily be configured in the settings section at the top of the code. 
+> This will use the power on position as the OPEN position.
 
 > If the motor spins but the cover stays in the "open" position it means either your encoder is not working or your motor is spinning in the opposite direction releative to your encoder. You can swap which lambda function is commented out to reverse the encoder direction. 
 
-> You can enable sensorless homeing (Stallguard) by uncommenting line 129, you may need to tune the threshold and current values to get this to work well.
+> Sensorless homing (Stallguard) is enabled whoch means if the motor stalls this becomes the new home (OPEN) position, you may need to tune the threshold and current values to get this to work well. See the settings section at the top to tune/disable.
 
 The **PD-Stepper-Blinds-Simple.yaml** config file simply treats the TMC2209 as a a4988 driver. The microsteps and PD voltage are set at startup by GPIO pins and the motor is driven via the STEP and DIR pins.
 
