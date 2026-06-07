@@ -1,7 +1,7 @@
 # This example uses a custom TMC2209 component to control the PD Stepper
 # It uses the encoder to get the current blind position so it will not lose home if blind is manually moved
 
-# If the motor stalls it stops the motor and sets this as the new home/OPEN position
+# If the motor stalls it stops the motor and sets this as the new home/OPEN position (configurable)
 
 # The "Home" button tries to move the blind up 120% of the set length and once a stall is detected it set this as the new home position (you may need to tune the stall theshold for you setup)
 # This can be enabled at boot by setting home_on_boot to "true" in the substitutions block.
@@ -13,16 +13,20 @@
 substitutions:
   #main settings you may want to change for your setup:
   device_name: "pd-stepper-blinds"     # ESPHome device name
-  encoder_closed_pos: "30000"          # full blinds length (in encoder counts) !! CHANGE TO SUIT YOUR SETUP !!
-  encoder_invert: "false"              # set to "true" to invert the encoder direction mapping
-  stall_threshold: "10"                # lower = more sensitive, raise if stall triggering too often
+  blinds_length: "30000"               # full blinds length (in encoder counts, 2048 per rev) !! CHANGE TO SUIT YOUR SETUP !! (make it negative to move in opposite direction!)
+  encoder_invert: "true"               # set to "true" to invert the encoder direction mapping (may be different for some motors)
+  stall_threshold: "20"                # higher = more sensitive, lower if stall triggering too often, 
+  run_current: "800m"                  # motor current (800m = 800mA, 1 = 1A etc.) (current is set here, potentiometer is ignored)
+  max_speed: "800"                     # steps/s
+  acceleration: "1500"                 # steps/s²
+  deceleration: "1500"                 # steps/s²
+  pd_voltage: "15V"                    # PD voltage: 5V | 9V | 12V | 15V | 20V
 
-  #additonal settings for different behaviours: 
+  #additonal settings for different behaviours: (set all 3 to false to disable sensotless homing alltogether)
+  home_on_boot: "false"                # set to "true" to automatically move and home the blind on boot
   stall_resets_home: "true"            # set to "false" to disable stall homing behaviour (motor will still stop on stall)
   stall_stops_motor: "true"            # set to "false" to disable motor stop on stall
-  home_on_boot: "false"                # set to "true" to automatically home the blind on boot
-
-
+  
 
 
 external_components:
@@ -76,16 +80,45 @@ esphome:
         tpowerdown: 0
         iholddelay: 0
         # irun: 16
-        run_current: 800m #Set your desired current here (800m = 800mA, 1 = 1A etc.)
+        run_current: ${run_current}
         standstill_mode: freewheeling
 
-     #set PD voltage    # 5V  9V  12V  15V  20V
-    - output.turn_off:  # 1   0    0    0    0
-        id: CFG1_pin
-    - output.turn_on:   # -   0    0    1    1
-        id: CFG2_pin
-    - output.turn_off:  # -   0    1    1    0
-        id: CFG3_pin
+    #set PD voltage: 5V=OFF/ON/OFF  9V=OFF/OFF/OFF  12V=OFF/OFF/ON  15V=OFF/ON/ON  20V=OFF/ON/OFF
+    - if:
+        condition:
+          lambda: return std::string("${pd_voltage}") == "5V";
+        then:
+          - output.turn_off: { id: CFG1_pin }
+          - output.turn_on:  { id: CFG2_pin }
+          - output.turn_off: { id: CFG3_pin }
+    - if:
+        condition:
+          lambda: return std::string("${pd_voltage}") == "9V";
+        then:
+          - output.turn_off: { id: CFG1_pin }
+          - output.turn_off: { id: CFG2_pin }
+          - output.turn_off: { id: CFG3_pin }
+    - if:
+        condition:
+          lambda: return std::string("${pd_voltage}") == "12V";
+        then:
+          - output.turn_off: { id: CFG1_pin }
+          - output.turn_off: { id: CFG2_pin }
+          - output.turn_on:  { id: CFG3_pin }
+    - if:
+        condition:
+          lambda: return std::string("${pd_voltage}") == "15V";
+        then:
+          - output.turn_off: { id: CFG1_pin }
+          - output.turn_on:  { id: CFG2_pin }
+          - output.turn_on:  { id: CFG3_pin }
+    - if:
+        condition:
+          lambda: return std::string("${pd_voltage}") == "20V";
+        then:
+          - output.turn_off: { id: CFG1_pin }
+          - output.turn_on:  { id: CFG2_pin }
+          - output.turn_off: { id: CFG3_pin }
 
     - delay: 0.5s
     - lambda: id(sensored_home_pos) = id(encoder)->get_state();  # Set the home (open) position to power on position
@@ -137,9 +170,9 @@ light:
 stepper:
   - platform: tmc2209
     id: motor
-    max_speed: 800 steps/s
-    acceleration: 1500 steps/s^2
-    deceleration: 1500 steps/s^2
+    max_speed: ${max_speed} steps/s
+    acceleration: ${acceleration} steps/s^2
+    deceleration: ${deceleration} steps/s^2
     rsense: 100 mOhm
     vsense: False
     enn_pin: 21
@@ -183,10 +216,8 @@ button:
     on_press:
       - stepper.set_target:
           id: motor
-          # 1.2 * encoder_closed_pos makes it travel 120% of the distance to ensure home is hit and a motor stall forces the new home position.
-          # The negative sign ensures it moves toward the "Home/Open" direction.
           target: !lambda |-
-            return -1.2 * ${encoder_closed_pos};
+            return -1.2 * ${blinds_length};
 
   - platform: template
     name: Stop
@@ -261,19 +292,20 @@ sensor:
 
       ########  NORMAL DIRECTION ########
       - lambda: |
-          const uint16_t curr = x; //current encoder value 0-4095
-          const uint16_t prev = id(encoder_tracking_)[0]; //previous encoder value 0-4095
+          const uint16_t curr = x;
+          const uint16_t prev = id(encoder_tracking_)[0];
           if (curr > 3000 && prev < 1000) {
-            id(encoder_tracking_)[1] -= (4095 - curr + prev); // crossed zero clockwise (went under 0)
+            id(encoder_tracking_)[1] -= (4095 - curr + prev);
           } else if (curr < 1000 && prev > 3000) {
-            id(encoder_tracking_)[1] += (4095 - prev + curr); // crossed zero counterclockwise (went over 4095)
+            id(encoder_tracking_)[1] += (4095 - prev + curr);
           } else {
             id(encoder_tracking_)[1] += (curr - prev);
           }
           id(encoder_tracking_)[0] = curr;
-          return id(encoder_tracking_)[1];
+          int32_t result = id(encoder_tracking_)[1];
+          if (${encoder_invert}) result = result * -1;
+          return result;
 
-      - multiply: 1.0
       - throttle: 250ms # limit the amount of new sensor states from this component
     accuracy_decimals: 0
     state_class: measurement
@@ -294,29 +326,29 @@ cover:
     assumed_state: false
     # internal: true
     lambda: |-
-      float pos = (id(encoder)->get_state() - id(sensored_home_pos)) / ${encoder_closed_pos};
-      return ${encoder_invert} ? 1.0 - pos : pos;
+      float pos = 1 - (id(encoder)->get_state() - id(sensored_home_pos)) / ${blinds_length};
+      return pos;
     stop_action:
       - stepper.stop: motor
     # 0.195 below is a fixed hardware constant: microsteps x steps/rev / encoder counts = 4 x 200 / 4096
     open_action:
       - stepper.report_position:
           id: motor
-          position: !lambda return (1.0-id(pd_blinds)->position) * ${encoder_closed_pos} * 0.195;
+          position: !lambda return (1.0-id(pd_blinds)->position) * ${blinds_length} * 0.195;
       - stepper.set_target:
           id: motor
           target: 0
     close_action:
       - stepper.report_position:
           id: motor
-          position: !lambda return (1.0-id(pd_blinds)->position) * ${encoder_closed_pos} * 0.195;
+          position: !lambda return (1.0-id(pd_blinds)->position) * ${blinds_length} * 0.195;
       - stepper.set_target:
           id: motor
-          target: !lambda return ${encoder_closed_pos} * 0.195 * 1.01;
+          target: !lambda return ${blinds_length} * 0.195 * 1.01;
     position_action:
       - stepper.report_position:
           id: motor
-          position: !lambda return (1.0-id(pd_blinds)->position) * ${encoder_closed_pos} * 0.195;
+          position: !lambda return (1.0-id(pd_blinds)->position) * ${blinds_length} * 0.195;
       - stepper.set_target:
           id: motor
-          target: !lambda return (1.0-pos) * ${encoder_closed_pos} * 0.195;
+          target: !lambda return (1.0-pos) * ${blinds_length} * 0.195;
