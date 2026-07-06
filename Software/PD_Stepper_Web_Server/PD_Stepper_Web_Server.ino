@@ -76,6 +76,21 @@ bool PGState = 0; //state of the power good signal from PD sink IC
 bool enabledState = 0;
 bool state = 0; //step state
 
+// ASSEMBLY / MOTION UNITS (gear-aware)
+// NOTE: position control is OPEN-LOOP: setPoint/CurrentPosition are maintained
+// by counting issued step pulses; encoder is not used for closed-loop control.
+const int MOTOR_STEPS_PER_REV = 200;      // NEMA17 typical full steps/rev
+const long COUNTS_PER_FULL_STEP = 256;    // internal counter units per full-step (preserve existing resolution)
+float GEAR_RATIO = 1.0;                   // motor revolutions per output-shaft revolution (1.0 = direct drive)
+// Derived helper: counts for one output-shaft revolution
+long countsPerOutputRev(){
+  return (long)( (long)MOTOR_STEPS_PER_REV * (long)COUNTS_PER_FULL_STEP * GEAR_RATIO );
+}
+// Convert degrees (output-shaft) -> internal position units
+long countsFromDegrees(float deg){
+  return (long)((deg / 360.0) * (double)countsPerOutputRev());
+}
+
 //AS5600 Hall Effect Encoder
 #include <Wire.h> //For I2C for encoder
 #define AS5600_ADDRESS 0x36 // I2C address of the AS5600 sensor
@@ -361,10 +376,10 @@ void loop() {
 
   if (posUpdatePending) {
     stepper_driver.moveAtVelocity(0); // Stop velocity mode
-    if (pendingPosMode == 1)      setPoint -= 25600;
-    else if (pendingPosMode == 2) setPoint -= 12800;
-    else if (pendingPosMode == 3) setPoint += 12800;
-    else if (pendingPosMode == 4) setPoint += 25600;
+    if (pendingPosMode == 1)      setPoint -= countsFromDegrees(90.0);   // large = 90°
+    else if (pendingPosMode == 2) setPoint -= countsFromDegrees(45.0);   // small = 45°
+    else if (pendingPosMode == 3) setPoint += countsFromDegrees(45.0);
+    else if (pendingPosMode == 4) setPoint += countsFromDegrees(90.0);
     posUpdatePending = false;
   }
 
@@ -395,7 +410,10 @@ void loop() {
       digitalWrite(DIR, LOW);
       digitalWrite(STEP, state);
       state = !state;
-      CurrentPosition = CurrentPosition + (256/microSteps);  //update current position taking into account microsteps set
+      // count only on the active (rising) edge -> when state == HIGH
+      if (state == HIGH) {
+        CurrentPosition = CurrentPosition + (COUNTS_PER_FULL_STEP/microSteps);  //update current position
+      }
       lastStep = micros();
     }
   } else if (setPoint < CurrentPosition){ //position control
@@ -403,7 +421,10 @@ void loop() {
       digitalWrite(DIR, HIGH);
       digitalWrite(STEP, state);
       state = !state;
-      CurrentPosition = CurrentPosition - (256/microSteps);  //update current position taking into account microsteps set
+      // count only on the active (rising) edge -> when state == HIGH
+      if (state == HIGH) {
+        CurrentPosition = CurrentPosition - (COUNTS_PER_FULL_STEP/microSteps);  //update current position
+      }
       lastStep = micros();
     }
   }
